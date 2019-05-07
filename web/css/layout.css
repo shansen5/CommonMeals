@@ -1,0 +1,68 @@
+#main {
+    width: 1200px;
+    margin: 0 auto;
+    position: relative;
+}
+
+#header {
+    height: 245px;
+    background: url(../img/header-bg.jpg) no-repeat center top;
+}
+#header, #content, #footer {
+    font-size: 0.75em;
+}
+
+.col-1, .col-2, .col-3 {
+    float: left;
+}
+
+.summary_col {
+    width: 40px;
+}
+
+.summary_cell {
+    text-align: center;
+}
+
+#attendee_table {
+    table-layout: fixed;
+}
+
+tr:hover {background-color: #f5f5f5; }
+
+.attendee_name_col {
+    width: 200px;
+}
+
+.attendee_special_col {
+    width: 3em;
+    align-content: left;
+}
+
+.attendee_allergy_col {
+    width: 8em;
+    margin-right: 20px;
+}
+
+.attendee_extra_col {
+    width: 100px;
+    padding: 15px;
+}
+
+input[type="number"] {
+    width: 4em;
+}
+
+#page #content .col-1 {
+    width: 200px;
+    margin-right: 10px;
+}
+#page #content .col-2 {
+    width: 800px;
+    min-height: 500px;
+}
+
+#footer {
+    margin-left: 200px;
+    height: 75px;
+}

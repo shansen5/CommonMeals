@@ -1,0 +1,49 @@
+<?php
+
+
+//~ Template for reports.php
+// variables:
+//  $title - page title
+//  $items - Meals to be displayed
+
+?>
+
+<table class="detail">
+    <tr>
+        <th>Actions</th>
+        <td>
+            <div class="actions">
+                <p>No reports are currently available.</p>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="onecolwrapper">
+    <form action="#" method="post">
+        <fieldset>
+            <div class="field">
+                <label>From:</label>
+                <input type="text" name="from_date" 
+                    <?php if ( $_POST[ "from_date" ]) {
+                              echo 'value="' . $_POST[ 'from_date' ] . '" '; 
+                          }
+                    ?>
+                    class = "text datepicker" />
+            </div>
+            <div class="field">
+                <label>To:</label>
+                <input type="text" name="to_date" 
+                    <?php if ( $_POST[ "to_date" ]) {
+                              echo 'value="' . $_POST[ 'to_date' ] . '" '; 
+                          }
+                    ?>
+                    class = "text datepicker" />
+            </div>
+            <div class="wrapper">
+                <input type="submit" name="save" value="FILTER" class="submit" />
+            </div>
+        </fieldset>
+    </form>
+</div>
+

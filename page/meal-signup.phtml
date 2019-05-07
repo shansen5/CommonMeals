@@ -1,0 +1,267 @@
+<?php
+
+
+//~ Template for meal-signup.php
+// variables:
+//  $errors - validation errors
+//  $meal - Meal for which to add or remove persons
+
+function error_field($title, array $errors) {
+    foreach ($errors as $error) {
+        /* @var $error Error */
+        if ($error->getSource() == $title) {
+            return ' error-field';
+        }
+    }
+    return '';
+}
+
+?>
+
+<?php if (!empty($errors)): ?>
+<ul class="errors">
+    <?php foreach ($errors as $error): ?>
+        <?php /* @var $error Error */ ?>
+        <li><?php echo $error->getMessage(); ?></li>
+    <?php endforeach; ?>
+</ul>
+<?php endif; ?>
+
+<div class="aligncenter">
+    <h3>
+        <?php echo 'Meal: ' . $meal->getSummary() .' - Team: ' 
+            . Utils::getMealTeamLeads( $meal->getMealTeamId() ); ?>
+    </h3>
+    <p>Date and Time:  <?php echo $meal->getDateTime(); ?></p>
+    <p>Signup by:  <?php echo $meal->getDeadline(); ?></p>
+    <p>Cost: $<?php echo $meal->getMealCost(); ?>, 
+    Ages 0-5: $<?php echo $meal->getMealCost1(); ?>, 
+    Ages 6-12: $<?php echo $meal->getMealCost2(); ?></p> 
+</div>
+<br/>
+<form action="#" method="post">
+    <fieldset>
+        <div  class="field">
+            <label>Add:</label>
+            <select class="signup_list" name="add_attendees[]" multiple size=4 >
+            <?php foreach ( $unit_members as $unit_person ) {
+                if ( ! in_array( $unit_person->getPersonId(), 
+                                 $meal_attendee_ids )) {
+                    echo '<option value = ' . 
+                         $unit_person->getPersonId() . '> ' .
+                         $unit_person->getFirstName() . ' ' . 
+                         $unit_person->getLastName() . 
+                         '</option>';
+                }
+            } ?>
+            </select>
+            <input type='submit' name='add' value='Add'>
+        </div>
+        <div class="field">
+            <label>Guests:</label>
+            <fieldset>
+                <?php if ( $role == Utils::MEALS_ADMIN ): ?>
+                    <div class="field">
+                        <label>Unit:</label>
+                        <input type='number' step='1'>
+                    </div>
+                <?php endif; ?>
+                <div class="field">
+                    <label>Adults:</label>
+                    <input type='number' step='1'>
+                </div>
+                <div class="field">
+                    <label>Child < 6:</label>
+                    <input type='number' step='1'>
+                    <input type='submit' name='add_guest' value='Add'>
+                </div>
+                <div class="field">
+                    <label>Child 6-12:</label>
+                    <input type='number' step='1'>
+                </div>
+            </fieldset>
+        </div>
+        <div class="field">
+            <label>Attending:</label>
+            <table id="attendee_table">
+              <col class="attendee_name_col">
+              <col class="attendee_special_col">
+              <col class="attendee_special_col">
+              <col class="attendee_special_col">
+              <col class="attendee_allergy_col">
+              <?php
+                if ( $role == Utils::MEALS_ADMIN ) {
+                    echo '<col class="attendee_extra_col">';
+                }
+              ?>
+              <tr>
+                <th>Person</th>
+                <th>Veg.</th>
+                <th>GF</th>
+                <th>DF</th>
+                <th>Allergies</th>
+                <?php
+                    if ( $role == Utils::MEALS_ADMIN ) {
+                        echo '<th>Extra Cost</th>';
+                    }
+                ?>
+              </tr>
+            
+            <?php 
+                if ( $meal_attendees ) {
+                    $role = Utils::getUserRole();
+                    foreach( $meal_attendees as $attendee ) {
+                        $person = $attendee->getPerson();
+                        $remove_ids = 'remove_ids[]';
+                        $edit_veg = 'edit_veg[]';
+                        $edit_gf = 'edit_gf[]';
+                        $edit_df = 'edit_df[]';
+                        $edit_other = 'edit_other[]';
+                        $extra_cost = 'extra_cost[]';
+                        echo "<tr>";
+                        echo "<td>";
+                        echo "<input type='checkbox' name='" . $remove_ids . "'";
+                        if ( $role == Utils::USER ) {
+                            if ( ! in_array( $person->getId(), 
+                                             $unit_member_ids )) {
+                                echo " disabled";
+                            }
+                        }
+                        echo " value='" . $person->getId() . "'>&nbsp;";
+                        echo $person->getFirstName() . " " .
+                             $person->getLastName();
+                        echo "</input>";
+                        echo "</td><td>";
+                        echo "<input type='checkbox' name='" . $edit_veg . "'";
+                        if ( $attendee->getSpecialsVeg() ) {
+                            echo " checked";
+                        }
+                        if ( $role == Utils::USER ) {
+                            if ( ! in_array( $person->getId(), 
+                                             $unit_member_ids )) {
+                                echo " disabled";
+                            }
+                        }
+                        echo " value='" . $person->getId() . "'>&nbsp;";
+                        echo "</input>";
+                        echo "</td><td>";
+                        echo "<input type='checkbox' name='" . $edit_gf . "'";
+                        if ( $attendee->getSpecialsGF() ) {
+                            echo " checked";
+                        }
+                        if ( $role == Utils::USER ) {
+                            if ( ! in_array( $person->getId(), 
+                                             $unit_member_ids )) {
+                                echo " disabled";
+                            }
+                        }
+                        echo " value='" . $person->getId() . "'>&nbsp;";
+                        echo "</input>";
+                        echo "</td><td>";
+                        echo "<input type='checkbox' name='" . $edit_df . "'";
+                        if ( $attendee->getSpecialsDF() ) {
+                            echo " checked";
+                        }
+                        if ( $role == Utils::USER ) {
+                            if ( ! in_array( $person->getId(), 
+                                             $unit_member_ids )) {
+                                echo " disabled";
+                            }
+                        }
+                        echo " value='" . $person->getId() . "'>&nbsp;";
+                        echo "</input>";
+                        echo "</td><td>";
+                        echo "<input type='text' size='15' name='edit_other-" . $person->getId() . "'";
+                        if ( $role == Utils::USER ) {
+                            if ( ! in_array( $person->getId(), 
+                                             $unit_member_ids )) {
+                                echo " disabled";
+                            }
+                        }
+                        if ( $attendee->getSpecialsOther() != '' ) {
+                            echo " value='" . $attendee->getSpecialsOther() . "' ";
+                        }
+                        echo "></input>";
+                        echo "</td>";
+                        if ( $role == Utils::MEALS_ADMIN ) {
+                            echo "<td>";
+                            echo "$<input type='number' step='.10' name='extra_cost-" . $person->getId() . "'";
+                            if ( $attendee->getExtraCost() != '' ) {
+                                echo " value='" . number_format( $attendee->getExtraCost(), 2 ) . "' ";
+                            }
+                            echo "></input>";
+                            echo "</td>";
+                        }
+                        echo "</td></tr>";
+                    }   
+                }
+            ?> 
+            <tr>
+              <td span=4>
+                <input type = 'submit' name = 'remove' value = 'Remove'>
+              </td>
+              <td>
+                <input type = 'submit' name = 'edit' value = 'Save'>
+              </td>
+            </tr>
+            <tr><td>&nbsp;</td></tr>
+        </table>
+        </div>
+    </fieldset>
+</form>
+<div class="field">
+    <label>Totals:</label>
+    <table class="detail">
+      <col class="summary_col">
+      <col class="summary_col">
+      <col class="summary_col">
+      <col class="summary_col">
+      <col class="summary_col">
+      <col class="summary_col">
+      <?php 
+          if ( $role == Utils::MEALS_ADMIN ) {
+              echo '<col id="summary_income_col">';
+          }
+      ?>
+      <tr>
+        <th colspan="3">Attending</th>
+        <th>Veg.</th>
+        <th>GF</th>
+        <th>DF</th>
+      <?php 
+          if ( $role == Utils::MEALS_ADMIN ) {
+              echo "<th>Income</th>";
+          }
+      ?>
+      </tr>
+      <tr>
+        <th>Adult</th>
+        <th>0-5</th>
+        <th>6-12</th>
+        <th/>
+        <th/>
+        <th/>
+      </tr>
+      <tr>
+        <td class="summary_cell"><?php echo $count_adults;?>&nbsp;</td>
+        <td class="summary_cell"><?php echo $count_0_5;?>&nbsp;</td>
+        <td class="summary_cell"><?php echo $count_6_12;?>&nbsp;</td>
+        <td class="summary_cell"><?php echo $count_veg;?>&nbsp;</td>
+        <td class="summary_cell"><?php echo $count_gf;?>&nbsp;</td>
+        <td class="summary_cell"><?php echo $count_df;?></td>
+      <?php 
+          if ( $role == Utils::MEALS_ADMIN ) {
+              echo '<td class="summary_cell">$' . number_format( $meal_income, 2 ) . '</td>';
+          }
+      ?>
+      </tr>
+    </table>
+</div>
+<p>
+    <?php $backLink = Utils::createLink('meal-list', array()); ?>
+    <a href="<?php echo $backLink; ?>"><img src="img/action/back.png" alt="" title="Back to the list." class="icon"/></a>&nbsp;
+    <a class="button" href="<?php echo $backLink; ?>">To the list</a>
+    <form action="#" method="post">
+        <input type="submit" name="download_report" value="Download"/>
+    </form>
+</p>

@@ -1,0 +1,102 @@
+<?php
+
+
+//~ Template for meal-list.php
+// variables:
+//  $title - page title
+//  $items - Meals to be displayed
+
+?>
+
+<table class="detail">
+    <tr>
+        <th>Actions</th>
+        <td>
+            <div class="actions">
+                <a href="<?php
+                echo Utils::createLink('add-edit-meal');
+                ?>"><img src="img/action/add.png" alt="" title="Add Meal" class="icon" /></a>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="onecolwrapper">
+    <form action="#" method="post">
+        <fieldset>
+            <div class="field">
+                <label>From:</label>
+                <input type="text" name="from_date" 
+                    <?php if ( $_POST[ "from_date" ]) {
+                              echo 'value="' . $_POST[ 'from_date' ] . '" '; 
+                          }
+                    ?>
+                    class = "text datepicker" />
+            </div>
+            <div class="field">
+                <label>To:</label>
+                <input type="text" name="to_date" 
+                    <?php if ( $_POST[ "to_date" ]) {
+                              echo 'value="' . $_POST[ 'to_date' ] . '" '; 
+                          }
+                    ?>
+                    class = "text datepicker" />
+            </div>
+            <div class="wrapper">
+                <input type="submit" name="save" value="FILTER" class="submit" />
+            </div>
+        </fieldset>
+    </form>
+</div>
+
+
+<?php if (empty($meals)): ?>
+    <p>No meals found.</p>
+<?php else: ?>
+    <table class="detail">
+        <tr>
+            <th>Team</th>
+            <th>Summary</th>
+            <th>Date/Time</th>
+            <th>Deadline</th>
+        </tr>
+        </th>
+        <?php foreach ($meals as $meal): ?>
+            <?php /* @var $unit Unit */ ?>
+            <tr>
+                <td>
+                    <?php 
+                        $leads = Utils::getMealTeamLeads( $meal->getMealTeamId() );
+                        echo Utils::escape($leads);
+                    ?>
+                </td>
+                <td>
+                    <a href="<?php echo Utils::createLink('meal-detail', array('meal_id' => $meal->getId())) ?>">
+                    <?php echo Utils::escape($meal->getSummary()) ?>
+                    </a>
+                </td>
+                <td>
+                    <?php echo Utils::escape($meal->getDateTime()) ?>
+                </td>
+                <td>
+                    <?php echo Utils::escape($meal->getDeadline()) ?>
+                </td>
+                <td>
+                    <?php
+                    $now = new DateTime();
+                    $deadline = $meal->getDeadlineDatetime();
+                    if ( $now < $deadline || $role === Utils::MEALS_ADMIN ) {
+                        echo "<a class='button' href='";
+                        echo Utils::createLink('meal-signup', 
+                                                array(
+                                                    'meal_id' => $meal->getId(), 
+                                                    'member_id'=> $_SESSION['oc_user'])); 
+                        echo "'> Sign Up </a>";
+                    }
+                    ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
+<?php endif; ?>
+

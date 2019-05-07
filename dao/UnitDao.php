@@ -5,22 +5,13 @@
  * <p>
  * 
  */
-final class UnitDao {
-
-    /** @var PDO */
-    private $db = null;
-
-
-    public function __destruct() {
-        // close db connection
-        $this->db = null;
-    }
+final class UnitDao extends AbstractDao {
 
     /**
      * Find all {@link Unit}s by search criteria.
      * @return array array of {@link Unit}s
      */
-    public function find(UnitSearchCriteria $search = null) {
+    public function find( AbstractSearchCriteria $search = null ) {
         $result = array();
         foreach ($this->query($this->getFindSql($search)) as $row) {
             $unit = new Unit();
@@ -62,7 +53,7 @@ final class UnitDao {
      * @param Unit $unit {@link Unit} to be saved
      * @return Unit saved {@link Unit} instance
      */
-    public function save(Unit $unit) {
+    public function save( AbstractModel $unit) {
         if ($unit->getId() === null) {
             return $this->insert($unit);
         }
@@ -86,24 +77,7 @@ final class UnitDao {
         return $statement->rowCount() == 1;
     }
 
-    /**
-     * @return PDO
-     */
-    private function getDb() {
-        if ($this->db !== null) {
-            return $this->db;
-        }
-        $config = Config::getConfig("db");
-        try {
-            $this->db = new PDO($config['dsn'], $config['username'], $config['password'], 
-                    array(PDO::MYSQL_ATTR_FOUND_ROWS => true));
-        } catch (Exception $ex) {
-            throw new Exception('DB connection error: ' . $ex->getMessage());
-        }
-        return $this->db;
-    }
-
-    private function getFindSql(UnitSearchCriteria $search = null) {
+    protected function getFindSql( AbstractSearchCriteria $search = null ) {
         $sql = 'SELECT * FROM units ';
         return $sql;
     }
@@ -112,7 +86,7 @@ final class UnitDao {
      * @return Todo
      * @throws Exception
      */
-    private function insert(Unit $unit) {
+    private function insert( AbstractModel $unit ) {
         $unit->setId( null );
         $sql = '
             INSERT INTO units (id, address, building_id, type_id, guest_limit)
@@ -124,7 +98,7 @@ final class UnitDao {
      * @return Todo
      * @throws Exception
      */
-    private function update(Unit $unit) {
+    private function update( AbstractModel $unit ) {
         $sql = '
             UPDATE units SET
                 address = :address,
@@ -136,23 +110,7 @@ final class UnitDao {
         return $this->execute($sql, $unit);
     }
 
-    /**
-     * @return Unit
-     * @throws Exception
-     */
-    private function execute($sql, Unit $unit) {
-        $statement = $this->getDb()->prepare($sql);
-        $this->executeStatement($statement, $this->getParams($unit));
-        if (!$unit->getId()) {
-            return $this->findById($this->getDb()->lastInsertId());
-        }
-        if (!$statement->rowCount()) {
-            throw new NotFoundException('Unit with ID "' . $unit->getId() . '" does not exist.');
-        }
-        return $unit;
-    }
-
-    private function getParams(Unit $unit) {
+    protected function getParams( AbstractModel $unit, $update = false ) {
         $params = array(
             ':id' => $unit->getId(),
             ':address' => $unit->getAddress(),
@@ -161,29 +119,6 @@ final class UnitDao {
             ':guest_limit' => $unit->getGuestLimit()
         );
         return $params;
-    }
-
-    private function executeStatement(PDOStatement $statement, array $params) {
-        if (!$statement->execute($params)) {
-            $errorInfo = $this->getDb()->errorInfo();
-            self::throwDbError( $errorInfo );
-        }
-    }
-
-    /**
-     * @return PDOStatement
-     */
-    private function query($sql) {
-        $statement = $this->getDb()->query($sql, PDO::FETCH_ASSOC);
-        if ($statement === false) {
-            self::throwDbError($this->getDb()->errorInfo());
-        }
-        return $statement;
-    }
-
-    private static function throwDbError(array $errorInfo) {
-        // TODO log error, send email, etc.
-        throw new Exception('DB error [' . $errorInfo[0] . ', ' . $errorInfo[1] . ']: ' . $errorInfo[2]);
     }
 
 }

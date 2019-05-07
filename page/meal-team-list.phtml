@@ -1,0 +1,51 @@
+<?php
+
+
+//~ Template for meal-team-list.php
+// variables:
+//  $title - page title
+//  $items - Teams to be displayed
+
+?>
+
+<table class="detail">
+    <tr>
+        <th>Actions</th>
+        <td>
+            <div class="actions">
+                <a href="<?php
+                echo Utils::createLink('add-edit-meal-team');
+                ?>"><img src="img/action/add.png" alt="" title="Add Meal" class="icon" /></a>
+            </div>
+        </td>
+    </tr>
+</table>
+
+
+<?php if (empty($teams)): ?>
+    <p>No meal teams found.</p>
+<?php else: ?>
+    <table class="detail">
+        <tr>
+            <th>Team Lead 1</th>
+            <th>Team Lead 2</th>
+        </tr>
+        </th>
+        <?php foreach ($teams as $team): ?>
+            <?php /* @var $team MealTeam */ ?>
+            <tr>
+                <td>
+                    <a href="<?php echo Utils::createLink('meal-team-detail', array('id' => $team->getId())) ?>">
+                    <?php echo Utils::escape($team->getLead1Name()) ?>
+                    </a>
+                </td>
+                <td>
+                    <a href="<?php echo Utils::createLink('meal-team-detail', array('id' => $team->getId())) ?>">
+                    <?php echo Utils::escape($team->getLead2Name()) ?>
+                    </a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
+<?php endif; ?>
+

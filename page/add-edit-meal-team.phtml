@@ -1,0 +1,111 @@
+<?php
+
+
+//~ Template for add-edit-meal-team.php
+// variables:
+//  $errors - validation errors
+//  $team - submitted MealTeam
+//  $edit - true for EDIT, false for ADD
+
+function error_field($title, array $errors) {
+    foreach ($errors as $error) {
+        /* @var $error RError */
+        if ($error->getSource() == $title) {
+            return ' error-field';
+        }
+    }
+    return '';
+}
+
+/* @var $team MealTeam */
+?>
+
+<h1>
+    <?php if ($edit): ?>
+        <?php 
+        echo "Edit MealTeam: " . Utils::escape( $team->getLead1Name() 
+            . " " . Utils::escape( $team->getLead2Name() ) );
+        ?>
+    <?php else: ?>
+        Add new MealTeam
+    <?php endif; ?>
+</h1>
+
+<?php if (!empty($errors)): ?>
+<ul class="errors">
+    <?php foreach ($errors as $error): ?>
+        <?php /* @var $error RError */ ?>
+        <li><?php echo $error->getMessage(); ?></li>
+    <?php endforeach; ?>
+</ul>
+<?php endif; ?>
+
+<form action="#" method="post">
+    <fieldset>
+        <div class='field'>
+            <label>Lead 1</label>
+            <select name="team[lead1_id]">
+                <?php
+                    foreach( Utils::getMealTeams() as $mt_info ) {
+                        echo "<option value='";
+                        echo $mt_info->getId();
+                        if ( $edit && $mt_info->getId() == $meal->getMealTeamId()) {
+                            echo 'selected="selected"';
+                        }
+                        echo "'>" . $mt_info->getLead1Name() . 
+                             $mt_info->getLead1Name() ? 
+                                ( ', ' . $mt_info->getLead2Name() ) : '' . 
+                             "</option>";
+                    }
+                ?>
+            </select>
+        </div>
+
+        <div  class="field">
+            <label>Summary:</label>
+            <input type="text" name="meal[summary]" value="<?php echo Utils::escape($meal->getSummary()); ?>"
+                   class="text<?php echo error_field('summary', $errors); ?>"/>
+        </div>
+        <div  class="field">
+            <label>Details:</label>
+            <input type="text" name="meal[details]" value="<?php echo Utils::escape($meal->getDetails()); ?>"
+                   class="text<?php echo error_field('details', $errors); ?>"/>
+        </div>
+        <div class="field">
+            <label>Meal Date:</label>
+            <input type="date" name="meal[meal_date]" 
+               value='<?php echo $meal_date_string; ?>'/> 
+        </div>
+        <div class="field">
+            <label>Meal Time:</label>
+            <input type="time" name="meal[meal_time]" 
+               value='<?php echo $meal_time_string; ?>'/> 
+        </div>
+        <div class="field">
+            <label>Signup Deadline Date:</label>
+            <input type="date" name="meal[deadline_date]" 
+               value='<?php echo $deadline_date_string; ?>'/> 
+        </div>
+        <div class="field">
+            <label>Signup Deadline Time:</label>
+            <input type="time" name="meal[deadline_time]" 
+               value='<?php echo $deadline_time_string; ?>'/> 
+        </div>
+        <div  class="field">
+            <label>Tags:</label>
+            <input type="text" name="meal[tags]" value="<?php echo Utils::escape($meal->getTags()); ?>"
+                   class="text<?php echo error_field('tags', $errors); ?>"/>
+        </div>
+        <div class="wrapper">
+            <input type="submit" name="cancel" value="CANCEL" class="submit" />
+            <input type="submit" name="save" value="<?php echo $edit ? 'EDIT' : 'ADD'; ?>" class="submit" />
+        </div>
+    </fieldset>
+</form>
+
+<p>
+    <?php $backLink = Utils::createLink('meal-list', array()); ?>
+    <a href="<?php echo $backLink; ?>"><img src="img/action/back.png" alt="" title="Back to the list." class="icon"/></a>&nbsp;
+    <a href="<?php echo $backLink; ?>">To the list</a>
+</p>
+

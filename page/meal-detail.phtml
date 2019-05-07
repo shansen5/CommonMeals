@@ -1,0 +1,83 @@
+<?php
+
+//~ Template for meal-detail.php
+// variables:
+//  $meal - Meal to be displayed
+
+/* @var $meal Meal */
+?>
+
+<h1>
+    <?php
+    echo Utils::escape( $meal->getSummary() ); 
+    ?>
+</h1>
+
+<table class="detail">
+    <tr>
+        <td>
+            <tr>
+                <th>Details</th>
+                <td><?php echo Utils::escape($meal->getDetails()); ?></td>
+            </tr>
+            <tr>
+                <th>Meal Cost</th>
+                <td><?php echo '$' . Utils::escape($meal->getMealCost()); ?></td>
+            </tr>
+            <tr>
+                <th>Ages 0 - 5</th>
+                <td><?php echo '$' . Utils::escape($meal->getMealCost1()); ?></td>
+            </tr>
+            <tr>
+                <th>Ages 6 - 12</th>
+                <td><?php echo '$' . Utils::escape($meal->getMealCost2()); ?></td>
+            </tr>
+            <tr>
+                <th>Date and Time</th>
+                <td><?php echo Utils::escape($meal->getDateTime()); ?></td>
+            </tr>
+            <tr>
+                <th>Tags</th>
+                <td><?php echo Utils::escape($meal->getTags()); ?></td>
+            </tr>
+            <tr>
+                <th>Team</th>
+                <td><?php echo Utils::getMealTeamLeads( $meal->getMealTeamId() ); ?></td>
+            </tr>
+            <tr>
+                <th>
+                    <a class='button' href="<?php 
+                        echo Utils::createLink('meal-signup', 
+                                                array(
+                                                    'meal_id' => $meal->getId(), 
+                                                    'member_id'=> $_SESSION['oc_user'])) 
+                        ?>"> Sign Up </a>
+                </th>
+            </tr>
+            <div class="actions">
+                <a href="<?php echo Utils::createLink('add-edit-meal', array('meal_id' => $meal->getId())); ?>"><img src="img/action/edit.png" alt="" title="Edit it." class="icon" /></a>
+                <a href="<?php echo Utils::createLink('meal-delete', array('id' => $meal->getId())); ?>" id="delete-link"><img src="img/action/delete.png" alt="" title="Delete it." class="icon" /></a>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<p>
+    <?php $backLink = Utils::createLink('meal-list', array()); ?>
+    <a href="<?php echo $backLink; ?>"><img src="img/action/back.png" alt="" title="Back to the list." class="icon"/></a>&nbsp;
+    <a class='button' href="<?php echo $backLink; ?>">To the list</a>
+</p>
+
+<div id="delete-dialog" title="Delete this Meal?">
+    <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>This Meal will be deleted. Are you sure?</p>
+</div>
+<div id="change-status-dialog">
+    <form id="change-status-form" method="post">
+        <fieldset>
+            <div class="field">
+                <label>Comment:</label>
+                <textarea name="comment" cols="1" rows="1"></textarea>
+            </div>
+        </fieldset>
+    </form>
+</div>

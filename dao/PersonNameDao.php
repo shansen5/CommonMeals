@@ -5,29 +5,13 @@
  * <p>
  * 
  */
-final class PersonNameDao {
-
-    /** @var PDO */
-    private $db = null;
-
-    /**
-     * 
-     * @param type $db PDO
-     */
-    public function __construct( $db = null ) {
-        $this->db = $db;
-    }
-
-    public function __destruct() {
-        // close db connection
-        $this->db = null;
-    }
+final class PersonNameDao extends AbstractDao {
 
     /**
      * Find all {@link Unit}s by search criteria.
      * @return array array of {@link Unit}s
      */
-    public function find(PersonNameSearchCriteria $search = null) {
+    public function find( AbstractSearchCriteria $search = null ) {
         $result = array();
         foreach ($this->query($this->getFindSql($search)) as $row) {
             $person_name = new PersonName();
@@ -92,23 +76,6 @@ final class PersonNameDao {
         return $statement->rowCount() == 1;
     }
 
-    /**
-     * @return PDO
-     */
-    private function getDb() {
-        if ($this->db !== null) {
-            return $this->db;
-        }
-        $config = Config::getConfig("db");
-        try {
-            $this->db = new PDO($config['dsn'], $config['username'], $config['password'], 
-                    array(PDO::MYSQL_ATTR_FOUND_ROWS => true));
-        } catch (Exception $ex) {
-            throw new Exception('DB connection error: ' . $ex->getMessage());
-        }
-        return $this->db;
-    }
-
     private function handleWhere( $sql, $where_started ) {
         if ( $where_started ) {
             $sql .= ' AND ';
@@ -118,8 +85,9 @@ final class PersonNameDao {
         return $sql;
     }
 
-    private function getFindSql(PersonNameSearchCriteria $search = null) {
-        $sql = 'SELECT id, person_id, first_name, last_name, start_date, end_date FROM person_names ';
+    protected function getFindSql( AbstractSearchCriteria $search = null ) {
+        $sql = 'SELECT id, person_id, first_name, last_name, start_date, end_date 
+                FROM person_names ';
         if ( $search && $search->hasFilter() ) {
             $where_started = false;
             if ( $search->getSearchDate() ) {
@@ -153,7 +121,7 @@ final class PersonNameDao {
      * @return Todo
      * @throws Exception
      */
-    public function insert(PersonName $person_name) {
+    public function insert( AbstractModel $person_name ) {
         $person_name->setId( null );
         $sql = 'INSERT INTO person_names (person_id, first_name, last_name, start_date, end_date)
                 VALUES (:person_id, :first_name, :last_name, :start_date, :end_date)';
@@ -166,7 +134,7 @@ final class PersonNameDao {
      * @return PersonName
      * @throws Exception
      */
-    private function update(PersonName $person_name) {
+    public function update( AbstractModel $person_name ) {
         $sql = '
             UPDATE person_names SET
                 person_id = :person_id,
@@ -179,17 +147,7 @@ final class PersonNameDao {
         return $this->execute($sql, $person_name, true);
     }
 
-    /**
-     * @return PersonName
-     * @throws Exception
-     */
-    private function execute($sql, PersonName $person_name, $update = false ) {
-        $statement = $this->getDb()->prepare($sql);
-        $this->executeStatement($statement, $this->getParams($person_name, $update));
-        return $person_name;
-    }
-
-    private function getParams(PersonName $person_name, $update ) {
+    protected function getParams( AbstractModel $person_name , $update = false ) {
         $params = array(
             ':person_id' => $person_name->getPersonId(),
             ':first_name' => $person_name->getFirstName(),
@@ -201,29 +159,6 @@ final class PersonNameDao {
             $params[ ':id'] = $person_name->getId();
         }
         return $params;
-    }
-
-    private function executeStatement(PDOStatement $statement, array $params) {
-        if (!$statement->execute($params)) {
-            $errorInfo = $this->getDb()->errorInfo();
-            self::throwDbError( $errorInfo );
-        }
-    }
-
-    /**
-     * @return PDOStatement
-     */
-    private function query($sql) {
-        $statement = $this->getDb()->query($sql, PDO::FETCH_ASSOC);
-        if ($statement === false) {
-            self::throwDbError($this->getDb()->errorInfo());
-        }
-        return $statement;
-    }
-
-    private static function throwDbError(array $errorInfo) {
-        // TODO log error, send email, etc.
-        throw new Exception('DB error [' . $errorInfo[0] . ', ' . $errorInfo[1] . ']: ' . $errorInfo[2]);
     }
 
 }

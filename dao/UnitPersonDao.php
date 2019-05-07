@@ -5,29 +5,13 @@
  * <p>
  * 
  */
-final class UnitPersonDao {
-
-    /** @var PDO */
-    private $db = null;
-
-    /**
-     * 
-     * @param type $db PDO
-     */
-    public function __construct( $db = null ) {
-        $this->db = $db;
-    }
-
-    public function __destruct() {
-        // close db connection
-        $this->db = null;
-    }
+final class UnitPersonDao extends AbstractDao {
 
     /**
      * Find all {@link Unit}s by search criteria.
      * @return array array of {@link Unit}s
      */
-    public function find(UnitPersonSearchCriteria $search = null) {
+    public function find( AbstractSearchCriteria $search = null ) {
         $result = array();
         $sql = $this->getFindSql($search);
         foreach ($this->query($sql) as $row) {
@@ -58,7 +42,7 @@ final class UnitPersonDao {
      * @param UnitPerson $unit_person {@link UnitPerson} to be saved
      * @return UnitPerson saved {@link UnitPerson} instance
      */
-    public function save( $unit_person ) {
+    public function save( AbstractModel $unit_person ) {
         if ( $unit_person->getId() === null ) {
             return $this->insert($unit_person);
         }
@@ -70,7 +54,7 @@ final class UnitPersonDao {
      * @param UnitPerson $unit_persons {@link UnitPerson} to be saved
      * @return UnitPerson saved {@link UnitPerson} instance
      */
-    public function saveAll( $unit_persons ) {
+    public function saveAll( array $unit_persons ) {
         foreach( $unit_persons as $unit_person ) {
             $this->save( $unit_person );
         }
@@ -93,23 +77,6 @@ final class UnitPersonDao {
         return $statement->rowCount() == 1;
     }
 
-    /**
-     * @return PDO
-     */
-    private function getDb() {
-        if ($this->db !== null) {
-            return $this->db;
-        }
-        $config = Config::getConfig("db");
-        try {
-            $this->db = new PDO($config['dsn'], $config['username'], $config['password'], 
-                    array(PDO::MYSQL_ATTR_FOUND_ROWS => true));
-        } catch (Exception $ex) {
-            throw new Exception('DB connection error: ' . $ex->getMessage());
-        }
-        return $this->db;
-    }
-
     private function handleWhere( $sql, $where_started ) {
         if ( $where_started ) {
             $sql .= ' AND ';
@@ -118,7 +85,8 @@ final class UnitPersonDao {
         } 
         return $sql;
     }
-    private function getFindSql(UnitPersonSearchCriteria $search = null) {
+
+    protected function getFindSql( AbstractSearchCriteria $search = null ) {
         $sql = 'SELECT pu.id as id, pu.unit_id as unit_id, pu.person_id as person_id, '
                 . 'pu.start_date as start_date, pu.end_date as end_date,'
                 . 'pu.type as occupant_type, pn.first_name as first_name, pn.last_name as last_name '
@@ -134,7 +102,7 @@ final class UnitPersonDao {
                 $sql .= ' AND ( pn.end_date is null OR pn.end_date >= ' . $search_date . ')';
             } else {
                 $sql = $this->handleWhere( $sql, $where_started );
-                $sql .= 'pn.end_date is null';
+                $sql .= 'pn.end_date is null AND pu.end_date is null ';
             }
             if ( $search->getUnitId() ) {
                 $sql = $this->handleWhere( $sql, $where_started );
@@ -148,8 +116,14 @@ final class UnitPersonDao {
                 $sql = $this->handleWhere( $sql, $where_started );
                 $sql .= 'pu.type = ' . "'" . $search->getOccupantType() . "'";
             }
+            if ( $search->getOrderByName() ) {
+                $sql .= ' ORDER BY pn.first_name';
+            } else {
+                $sql .= ' ORDER BY pu.start_date';
+            }
+        } else {
+            $sql .= ' ORDER BY pu.start_date';
         }
-        $sql .= ' ORDER BY pu.start_date';
         return $sql;
     }
 
@@ -157,7 +131,7 @@ final class UnitPersonDao {
      * @return Todo
      * @throws Exception
      */
-    public function insert(UnitPerson $up) {
+    public function insert( AbstractModel $up ) {
         $up->setId( null );
         $sql = 'INSERT INTO person_units (unit_id, person_id, start_date, end_date, type)
                 VALUES (:unit_id, :person_id, :start_date, :end_date, :type)';
@@ -170,7 +144,7 @@ final class UnitPersonDao {
      * @return UnitPerson
      * @throws Exception
      */
-    private function update(UnitPerson $unit_person) {
+    public function update( AbstractModel $unit_person ) {
         $sql = '
             UPDATE person_units SET
                 unit_id = :unit_id,
@@ -183,20 +157,7 @@ final class UnitPersonDao {
         return $this->execute($sql, $unit_person, true);
     }
 
-    /**
-     * @return Unit
-     * @throws Exception
-     */
-    private function execute($sql, UnitPerson $unit_person, $update = false) {
-        $statement = $this->getDb()->prepare($sql);
-        $this->executeStatement($statement, $this->getParams($unit_person, $update));
-        if (!$statement->rowCount()) {
-            throw new NotFoundException('UnitPerson with ID "' . $unit_person->getId() . '" does not exist.');
-        }
-        return $unit_person;
-    }
-
-    private function getParams(UnitPerson $unit_person, $update) {
+    protected function getParams( AbstractModel $unit_person, $update = false ) {
         $params = array(
             ':unit_id' => $unit_person->getUnitId(),
             ':person_id' => $unit_person->getPersonId(),
@@ -208,29 +169,6 @@ final class UnitPersonDao {
             $params[':id'] = $unit_person->getId();
         }
         return $params;
-    }
-
-    private function executeStatement(PDOStatement $statement, array $params) {
-        if (!$statement->execute($params)) {
-            $errorInfo = $this->getDb()->errorInfo();
-            self::throwDbError( $errorInfo );
-        }
-    }
-
-    /**
-     * @return PDOStatement
-     */
-    private function query($sql) {
-        $statement = $this->getDb()->query($sql, PDO::FETCH_ASSOC);
-        if ($statement === false) {
-            self::throwDbError($this->getDb()->errorInfo());
-        }
-        return $statement;
-    }
-
-    private static function throwDbError(array $errorInfo) {
-        // TODO log error, send email, etc.
-        throw new Exception('DB error [' . $errorInfo[0] . ', ' . $errorInfo[1] . ']: ' . $errorInfo[2]);
     }
 
 }

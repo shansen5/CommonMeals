@@ -1,0 +1,43 @@
+<?php
+  unset( $_SESSION['oc_user'] );
+  unset( $_SESSION['oc_user_role'] );
+  $people = Utils::getCurrentAdultsAndIds();
+?>
+<html>
+<head>
+  <title>User Login</title>
+  <link rel="stylesheet" type="text/css" href="css/login.css" />
+</head>
+<body>
+  <form name="frmUser" method="post" action="index.php">
+    <table border="0" cellpadding="10" cellspacing="1" width="500" align="center">
+      <tr class="tableheader">
+        <td align="center" colspan="2">Enter Login Details</td>
+      </tr>
+      <tr class="tablerow">
+        <td align="right">Person</td>
+        <td><select name='person_id' size='1'>
+        <?php
+            $first_name = '';
+            $last_name = '';
+            $person_id = 0;
+            foreach ( $people as $person ) {
+                $person_id = $person->getId();
+                $first_name = $person->getFirstName();
+                $last_name = $person->getLastName();
+                echo '<option value="' . $person_id . '">' . $first_name . 
+                     ' ' . $last_name . '</option>';
+            }
+        ?>
+            </select></td>
+      </tr>
+      <tr class="tablerow">
+        <td align="right">Password</td>
+        <td><input type="password" name="password"></td>
+      </tr>
+      <tr class="tableheader">
+        <td align="center" colspan="2"><input type="submit" name="submit" value="Submit"></td>
+      </tr>
+    </table>
+  </form>
+</body></html>
