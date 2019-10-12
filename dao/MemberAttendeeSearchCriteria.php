@@ -2,11 +2,11 @@
 
 
 /**
- * Search criteria for {@link MealAttendeeDao}.
+ * Search criteria for {@link MemberAttendeeDao}.
  * <p>
- * Can be easily extended without changing the {@link MealAttendeeDao} API.
+ * Can be easily extended without changing the {@link MemberAttendeeDao} API.
  */
-final class MealAttendeeSearchCriteria extends AbstractSearchCriteria {
+final class MemberAttendeeSearchCriteria extends AbstractSearchCriteria {
     private $id = 0;
     private $meal_id;
     private $person_id;

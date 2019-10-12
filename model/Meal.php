@@ -25,6 +25,8 @@ final class Meal extends AbstractModel {
     private $meal_cost_1;
     /** @var number */
     private $meal_cost_2;
+    /** @var number */
+    private $sign_up_limit;
 
     private $team_lead;
 
@@ -74,6 +76,18 @@ final class Meal extends AbstractModel {
 
     public function setMealCost2( $cost ) {
         $this->meal_cost_2 = $cost;
+    }
+
+    /**
+     * Limit on number of meal attendees
+     * @return number
+     */
+    public function getSignUpLimit() {
+        return $this->sign_up_limit;
+    }
+
+    public function setSignUpLimit( $limit ) {
+        $this->sign_up_limit = $limit;
     }
 
     /**

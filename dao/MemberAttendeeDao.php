@@ -1,11 +1,11 @@
 <?php
 
 /**
- * DAO for {@link MealAttendee}.
+ * DAO for {@link MemberAttendee}.
  * <p>
  * 
  */
-final class MealAttendeeDao extends AbstractDao {
+final class MemberAttendeeDao extends AbstractDao {
 
     private function handleWhere( $sql, $where_started ) {
         if ( $where_started ) {
@@ -23,8 +23,8 @@ final class MealAttendeeDao extends AbstractDao {
     public function find( AbstractSearchCriteria $search = null ) {
         $result = array();
         foreach ( $this->query( $this->getFindSql( $search )) as $row ) {
-            $attendee = new MealAttendee();
-            MealAttendeeMapper::map( $attendee, $row );
+            $attendee = new MemberAttendee();
+            MemberAttendeeMapper::map( $attendee, $row );
             $result[ $attendee->getId() ] = $attendee;
             $dao = new PersonDao();
             $person = $dao->findById( $attendee->getPersonId() );
@@ -37,8 +37,8 @@ final class MealAttendeeDao extends AbstractDao {
     }
 
     /**
-     * Find {@link MealAttendee} by identifier.
-     * @return MealAttendee or <i>null</i> if not found
+     * Find {@link MemberAttendee} by identifier.
+     * @return MemberAttendee or <i>null</i> if not found
      */
     public function findById($id) {
         $row = $this->query(
@@ -48,8 +48,8 @@ final class MealAttendeeDao extends AbstractDao {
         if (!$row) {
             return null;
         }
-        $attendee = new MealAttendee();
-        MealAttendeeMapper::map( $attendee, $row );
+        $attendee = new MemberAttendee();
+        MemberAttendeeMapper::map( $attendee, $row );
         $dao = new PersonDao();
         $person = $dao->findById( $attendee->getPersonId() );
         if ($person === null) {
@@ -60,9 +60,9 @@ final class MealAttendeeDao extends AbstractDao {
     }
 
     /**
-     * Save {@link MealAttendee}.
-     * @param MealAttendee $attendee {@link MealAttendee} to be saved
-     * @return MealAttendee saved {@link MealAttendee} instance
+     * Save {@link MemberAttendee}.
+     * @param MemberAttendee $attendee {@link MemberAttendee} to be saved
+     * @return MemberAttendee saved {@link MemberAttendee} instance
      */
     public function save( AbstractModel $attendee ) {
         if ( $attendee->getId() === null ) {
@@ -72,8 +72,8 @@ final class MealAttendeeDao extends AbstractDao {
     }
 
     /**
-     * Delete {@link MealAttendee} by identifier.
-     * @param int $id {@link MealAttendee} identifier
+     * Delete {@link MemberAttendee} by identifier.
+     * @param int $id {@link MemberAttendee} identifier
      * @return bool <i>true</i> on success, <i>false</i> otherwise
      */
     public function delete( $id ) {
@@ -89,7 +89,7 @@ final class MealAttendeeDao extends AbstractDao {
     }
 
     /**
-     * @return MealAttendee
+     * @return MemberAttendee
      * @throws Exception
      */
     public function insert( AbstractModel $attendee ) {
@@ -101,7 +101,7 @@ final class MealAttendeeDao extends AbstractDao {
     }
 
     /**
-     * @return MealAttendee
+     * @return MemberAttendee
      * @throws Exception
      */
     public function addAttendees( array $attendees, $meal_id ) {
@@ -144,7 +144,7 @@ final class MealAttendeeDao extends AbstractDao {
     }
 
     /**
-     * @return MealAttendee
+     * @return MemberAttendee
      * @throws Exception
      */
     public function update( AbstractModel $attendee ) {
@@ -161,9 +161,9 @@ final class MealAttendeeDao extends AbstractDao {
 
     protected function getFindSql( AbstractSearchCriteria $search = null ) {
         $sql = 'SELECT id, meal_id, person_id, specials, extra_cost '
-                . ' FROM meal_attendees ';
+                . ' FROM meal_attendees WHERE person_id is not null ';
         if ( $search and $search->hasFilter() ) {
-            $where_started = false;
+            $where_started = true;
             if ( $search->getMealId() ) {
                 $sql = $this->handleWhere( $sql, $where_started );
                 $sql .= ' meal_id = ' . $search->getMealId();

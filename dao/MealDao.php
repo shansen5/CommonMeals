@@ -28,8 +28,8 @@ final class MealDao extends AbstractDao {
     public function findById($id) {
         $row = $this->query(
                 'SELECT id, meal_team_id, summary, details, meal_datetime, '
-                    . 'tags, person_id, deadline, meal_cost, meal_cost_1, meal_cost_2 '
-                    . ' FROM meals u WHERE id = ' . (int) $id)->fetch();
+                    . 'tags, person_id, deadline, meal_cost, meal_cost_1, meal_cost_2, '
+                    . 'sign_up_limit FROM meals u WHERE id = ' . (int) $id)->fetch();
         if (!$row) {
             return null;
         }
@@ -76,10 +76,10 @@ final class MealDao extends AbstractDao {
         $sql = '
             INSERT INTO meals (id, meal_team_id, summary, details, 
                 meal_datetime, tags, person_id, deadline, meal_cost, 
-                meal_cost_1, meal_cost_2)
+                meal_cost_1, meal_cost_2, sign_up_limit)
                 VALUES (:id, :meal_team_id, :summary, :details, 
                 :meal_datetime, :tags, :person_id, :deadline,
-                :meal_cost, :meal_cost_1, :meal_cost_2)';
+                :meal_cost, :meal_cost_1, :meal_cost_2, :sign_up_limit)';
         return $this->execute( $sql, $meal );
     }
 
@@ -99,7 +99,8 @@ final class MealDao extends AbstractDao {
                 deadline = :deadline,
                 meal_cost = :meal_cost,
                 meal_cost_1 = :meal_cost_1,
-                meal_cost_2 = :meal_cost_2
+                meal_cost_2 = :meal_cost_2,
+                sign_up_limit = :sign_up_limit
             WHERE
                 id = :id';
         return $this->execute( $sql, $meal );
@@ -118,7 +119,7 @@ final class MealDao extends AbstractDao {
         }
         $sql = 'SELECT id, meal_team_id, summary, details, meal_datetime, '
                 . 'tags, person_id, deadline, meal_cost, meal_cost_1, '
-                . 'meal_cost_2 '
+                . 'meal_cost_2, sign_up_limit '
                 . ' FROM meals '
                 . 'WHERE meal_datetime >= "' . $from_date . '"';
         if ( $to_date ) {
@@ -140,7 +141,8 @@ final class MealDao extends AbstractDao {
             ':deadline' => $meal->getDeadline(),
             ':meal_cost' => $meal->getMealCost(),
             ':meal_cost_1' => $meal->getMealCost1(),
-            ':meal_cost_2' => $meal->getMealCost2()
+            ':meal_cost_2' => $meal->getMealCost2(),
+            ':sign_up_limit' => $meal->getSignUpLimit()
         );
         return $params;
     }

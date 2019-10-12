@@ -1,16 +1,16 @@
 <?php
 
 /**
- * Mapper for {@link MealAttendee} 
- * @see MealAttendeeValidator
+ * Mapper for {@link MemberAttendee} 
+ * @see MemberAttendeeValidator
  */
-final class MealAttendeeMapper {
+final class MemberAttendeeMapper {
 
     private function __construct() {
     }
 
     /**
-     * Maps array to the given {@link MealAttendee}.
+     * Maps array to the given {@link MemberAttendee}.
      * <p>
      * Expected properties are:
      * <ul>
@@ -20,11 +20,11 @@ final class MealAttendeeMapper {
      *   <li>extra_cost</li>
      *   <li>specials</li>
      * </ul>
-     * @param MealAttendee $attendee
+     * @param MemberAttendee $attendee
      * @param array $properties
      */
 
-    public static function map( MealAttendee $attendee, array $properties ) {
+    public static function map( MemberAttendee $attendee, array $properties ) {
         if (array_key_exists('id', $properties)) {
             $attendee->setId($properties['id']);
         }

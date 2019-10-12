@@ -67,8 +67,11 @@ final class MealMapper {
         if (array_key_exists('meal_cost_1', $properties)) {
             $meal->setMealCost1($properties['meal_cost_1']);
         }
-        if (array_key_exists('meal_cost', $properties)) {
+        if (array_key_exists('meal_cost_2', $properties)) {
             $meal->setMealCost2($properties['meal_cost_2']);
+        }
+        if (array_key_exists('sign_up_limit', $properties)) {
+            $meal->setSignUpLimit($properties['sign_up_limit']);
         }
         if (array_key_exists('person_id', $properties)) {
             $meal->setPersonId($properties['person_id']);

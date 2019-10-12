@@ -38,6 +38,7 @@ if (array_key_exists('cancel', $_POST)) {
         'meal_cost' => $_POST['meal']['meal_cost'],
         'meal_cost_1' => $_POST['meal']['meal_cost_1'],
         'meal_cost_2' => $_POST['meal']['meal_cost_2'],
+        'sign_up_limit' => $_POST['meal']['sign_up_limit'],
         'meal_time' => $_POST['meal']['meal_time'],
         'deadline_date' => $_POST['meal']['deadline_date'],
         'deadline_time' => $_POST['meal']['deadline_time'],
@@ -59,14 +60,14 @@ if (array_key_exists('cancel', $_POST)) {
             DBConnection::close();
             Flash::addFlash('Meal saved successfully.');
             // redirect
-            Utils::redirect('meal-detail', array('meal_id' => $meal->getId()));
+            Utils::redirect('add-edit-meal', array('meal_id' => $meal->getId()));
         } catch( Exception $e ) {
             $error = new RError( 'transaction', $e->getMessage() );
             $errors[] = $error;
             DBConnection::rollback();
             Flash::addFlash('Failed to save meal.');
             // redirect
-            Utils::redirect('meal-list', array('meal_id' => $meal->getId()));
+            Utils::redirect('add-edit-meal', array('meal_id' => $meal->getId()));
             DBConnection::close();
         }
         

@@ -113,6 +113,11 @@ function error_field($title, array $errors) {
             <input type="text" name="meal[tags]" value="<?php echo Utils::escape($meal->getTags()); ?>"
                    class="text<?php echo error_field('tags', $errors); ?>"/>
         </div>
+        <div  class="field">
+            <label>Sign Up Limit:</label>
+            <input type="number" step="1" min="0" name="meal[sign_up_limit]" value="<?php echo Utils::escape($meal->getSignUpLimit()); ?>"
+                   class="text<?php echo error_field('sign_up_limit', $errors); ?>"/>
+        </div>
         <div class="wrapper">
             <input type="submit" name="cancel" value="CANCEL" class="submit" />
             <input type="submit" name="save" value="<?php echo $edit ? 'SAVE' : 'ADD'; ?>" class="submit" />

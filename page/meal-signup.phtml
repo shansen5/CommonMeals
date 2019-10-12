@@ -16,6 +16,171 @@ function error_field($title, array $errors) {
     return '';
 }
 
+function show_member_attendees( $member_attendees, $unit_member_ids ) {
+    $role = Utils::getUserRole();
+    foreach( $member_attendees as $attendee ) {
+        $person = $attendee->getPerson();
+        $remove_ids = 'remove_ids[]';
+        $edit_veg = 'edit_veg[]';
+        $edit_gf = 'edit_gf[]';
+        $edit_df = 'edit_df[]';
+        echo "<tr>";
+        echo "<td>";
+        echo "<input type='checkbox' name='" . $remove_ids . "'";
+        if ( $role == Utils::USER ) {
+            if ( ! in_array( $person->getId(), 
+                             $unit_member_ids )) {
+                echo " disabled";
+            }
+        }
+        echo " value='" . $person->getId() . "'>&nbsp;";
+        echo $person->getFirstName() . " " .
+             $person->getLastName();
+        echo "</input>";
+        echo "</td><td>";
+        echo "<input type='checkbox' name='" . $edit_veg . "'";
+        if ( $attendee->getSpecialsVeg() ) {
+            echo " checked";
+        }
+        if ( $role == Utils::USER ) {
+            if ( ! in_array( $person->getId(), 
+                             $unit_member_ids )) {
+                echo " disabled";
+            }
+        }
+        echo " value='" . $person->getId() . "'>&nbsp;";
+        echo "</input>";
+        echo "</td><td>";
+        echo "<input type='checkbox' name='" . $edit_gf . "'";
+        if ( $attendee->getSpecialsGF() ) {
+            echo " checked";
+        }
+        if ( $role == Utils::USER ) {
+            if ( ! in_array( $person->getId(), 
+                             $unit_member_ids )) {
+                echo " disabled";
+            }
+        }
+        echo " value='" . $person->getId() . "'>&nbsp;";
+        echo "</input>";
+        echo "</td><td>";
+        echo "<input type='checkbox' name='" . $edit_df . "'";
+        if ( $attendee->getSpecialsDF() ) {
+            echo " checked";
+        }
+        if ( $role == Utils::USER ) {
+            if ( ! in_array( $person->getId(), 
+                             $unit_member_ids )) {
+                echo " disabled";
+            }
+        }
+        echo " value='" . $person->getId() . "'>&nbsp;";
+        echo "</input>";
+        echo "</td><td>";
+        echo "<input type='text' size='15' name='edit_other-" . $person->getId() . "'";
+        if ( $role == Utils::USER ) {
+            if ( ! in_array( $person->getId(), 
+                             $unit_member_ids )) {
+                echo " disabled";
+            }
+        }
+        if ( $attendee->getSpecialsOther() != '' ) {
+            echo " value='" . $attendee->getSpecialsOther() . "' ";
+        }
+        echo "></input>";
+        echo "</td>";
+        if ( $role == Utils::MEALS_ADMIN ) {
+            echo "<td>";
+            echo "$<input type='number' step='.10' name='extra_cost-" . $person->getId() . "'";
+            if ( $attendee->getExtraCost() != '' ) {
+                echo " value='" . number_format( $attendee->getExtraCost(), 2 ) . "' ";
+            }
+            echo "></input>";
+            echo "</td>";
+        }
+        echo "</td></tr>";
+    }   
+}
+
+function show_guests( $guests, $guest_unit_id ) {
+    $role = Utils::getUserRole();
+    foreach( $guests as $guest ) {
+        $remove_guest_ids = 'remove_guest_ids[]';
+        $edit_veg = 'guest_edit_veg[]';
+        $edit_gf = 'guest_edit_gf[]';
+        $edit_df = 'guest_edit_df[]';
+        echo "<tr>";
+        echo "<td>";
+        echo "<input type='checkbox' name='" . $remove_guest_ids . "'";
+        if ( $role == Utils::USER ) {
+            if ( $guest->getUnitId() != $guest_unit_id ) {
+                echo " disabled";
+            }
+        }
+        echo " value='" . $guest->getId() . "'>&nbsp;";
+        echo "Unit " . $guest->getUnitId() . " guest - " .
+             $guest->getGuestAge();
+        echo "</input>";
+        echo "</td><td>";
+        echo "<input type='checkbox' name='" . $edit_veg . "'";
+        if ( $guest->getSpecialsVeg() ) {
+            echo " checked";
+        }
+        if ( $role == Utils::USER ) {
+            if ( $guest->getUnitId() != $guest_unit_id ) {
+                echo " disabled";
+            }
+        }
+        echo " value='" . $guest->getId() . "'>&nbsp;";
+        echo "</input>";
+        echo "</td><td>";
+        echo "<input type='checkbox' name='" . $edit_gf . "'";
+        if ( $guest->getSpecialsGF() ) {
+            echo " checked";
+        }
+        if ( $role == Utils::USER ) {
+            if ( $guest->getUnitId() != $guest_unit_id ) {
+                echo " disabled";
+            }
+        }
+        echo " value='" . $guest->getId() . "'>&nbsp;";
+        echo "</input>";
+        echo "</td><td>";
+        echo "<input type='checkbox' name='" . $edit_df . "'";
+        if ( $guest->getSpecialsDF() ) {
+            echo " checked";
+        }
+        if ( $role == Utils::USER ) {
+            if ( $guest->getUnitId() != $guest_unit_id ) {
+                echo " disabled";
+            }
+        }
+        echo " value='" . $guest->getId() . "'>&nbsp;";
+        echo "</input>";
+        echo "</td><td>";
+        echo "<input type='text' size='15' name='guest_edit_other-" . $guest->getId() . "'";
+        if ( $role == Utils::USER ) {
+            if ( $guest->getUnitId() != $guest_unit_id ) {
+                echo " disabled";
+            }
+        }
+        if ( $guest->getSpecialsOther() != '' ) {
+            echo " value='" . $guest->getSpecialsOther() . "' ";
+        }
+        echo "></input>";
+        echo "</td>";
+        if ( $role == Utils::MEALS_ADMIN ) {
+            echo "<td>";
+            echo "$<input type='number' step='.10' name='guest_extra_cost-" . $guest->getId() . "'";
+            if ( $guest->getExtraCost() != '' ) {
+                echo " value='" . number_format( $guest->getExtraCost(), 2 ) . "' ";
+            }
+            echo "></input>";
+            echo "</td>";
+        }
+        echo "</td></tr>";
+    }   
+}
 ?>
 
 <?php if (!empty($errors)): ?>
@@ -35,8 +200,8 @@ function error_field($title, array $errors) {
     <p>Date and Time:  <?php echo $meal->getDateTime(); ?></p>
     <p>Signup by:  <?php echo $meal->getDeadline(); ?></p>
     <p>Cost: $<?php echo $meal->getMealCost(); ?>, 
-    Ages 0-5: $<?php echo $meal->getMealCost1(); ?>, 
-    Ages 6-12: $<?php echo $meal->getMealCost2(); ?></p> 
+    <p>Young child: $<?php echo $meal->getMealCost1(); ?>, 
+    <p>Older child: $<?php echo $meal->getMealCost2(); ?></p> 
 </div>
 <br/>
 <form action="#" method="post">
@@ -46,7 +211,7 @@ function error_field($title, array $errors) {
             <select class="signup_list" name="add_attendees[]" multiple size=4 >
             <?php foreach ( $unit_members as $unit_person ) {
                 if ( ! in_array( $unit_person->getPersonId(), 
-                                 $meal_attendee_ids )) {
+                                 $member_attendee_ids )) {
                     echo '<option value = ' . 
                          $unit_person->getPersonId() . '> ' .
                          $unit_person->getFirstName() . ' ' . 
@@ -55,7 +220,7 @@ function error_field($title, array $errors) {
                 }
             } ?>
             </select>
-            <input type='submit' name='add' value='Add'>
+            <input type='submit' name='add_member' value='Add'>
         </div>
         <div class="field">
             <label>Guests:</label>
@@ -63,22 +228,23 @@ function error_field($title, array $errors) {
                 <?php if ( $role == Utils::MEALS_ADMIN ): ?>
                     <div class="field">
                         <label>Unit:</label>
-                        <input type='number' step='1'>
+                        <input name='guest_unit' type='number' step='1' min='1' max='33' value=<?php echo $unit_id; ?> >
                     </div>
                 <?php endif; ?>
                 <div class="field">
                     <label>Adults:</label>
-                    <input type='number' step='1'>
+                    <input name='guest_adults' type='number' step='1' min='0'>
                 </div>
                 <div class="field">
-                    <label>Child < 6:</label>
-                    <input type='number' step='1'>
+                    <label>Child (<8):</label>
+                    <input name='guest_child_young' type='number' step='1' min='0'>
                     <input type='submit' name='add_guest' value='Add'>
                 </div>
                 <div class="field">
-                    <label>Child 6-12:</label>
-                    <input type='number' step='1'>
+                    <label>Child (8-11):</label>
+                    <input name='guest_child_older' type='number' step='1' min='0'>
                 </div>
+                <!-- <input type="hidden" name="guest_child_cost" value="0" > -->
             </fieldset>
         </div>
         <div class="field">
@@ -108,92 +274,11 @@ function error_field($title, array $errors) {
               </tr>
             
             <?php 
-                if ( $meal_attendees ) {
-                    $role = Utils::getUserRole();
-                    foreach( $meal_attendees as $attendee ) {
-                        $person = $attendee->getPerson();
-                        $remove_ids = 'remove_ids[]';
-                        $edit_veg = 'edit_veg[]';
-                        $edit_gf = 'edit_gf[]';
-                        $edit_df = 'edit_df[]';
-                        $edit_other = 'edit_other[]';
-                        $extra_cost = 'extra_cost[]';
-                        echo "<tr>";
-                        echo "<td>";
-                        echo "<input type='checkbox' name='" . $remove_ids . "'";
-                        if ( $role == Utils::USER ) {
-                            if ( ! in_array( $person->getId(), 
-                                             $unit_member_ids )) {
-                                echo " disabled";
-                            }
-                        }
-                        echo " value='" . $person->getId() . "'>&nbsp;";
-                        echo $person->getFirstName() . " " .
-                             $person->getLastName();
-                        echo "</input>";
-                        echo "</td><td>";
-                        echo "<input type='checkbox' name='" . $edit_veg . "'";
-                        if ( $attendee->getSpecialsVeg() ) {
-                            echo " checked";
-                        }
-                        if ( $role == Utils::USER ) {
-                            if ( ! in_array( $person->getId(), 
-                                             $unit_member_ids )) {
-                                echo " disabled";
-                            }
-                        }
-                        echo " value='" . $person->getId() . "'>&nbsp;";
-                        echo "</input>";
-                        echo "</td><td>";
-                        echo "<input type='checkbox' name='" . $edit_gf . "'";
-                        if ( $attendee->getSpecialsGF() ) {
-                            echo " checked";
-                        }
-                        if ( $role == Utils::USER ) {
-                            if ( ! in_array( $person->getId(), 
-                                             $unit_member_ids )) {
-                                echo " disabled";
-                            }
-                        }
-                        echo " value='" . $person->getId() . "'>&nbsp;";
-                        echo "</input>";
-                        echo "</td><td>";
-                        echo "<input type='checkbox' name='" . $edit_df . "'";
-                        if ( $attendee->getSpecialsDF() ) {
-                            echo " checked";
-                        }
-                        if ( $role == Utils::USER ) {
-                            if ( ! in_array( $person->getId(), 
-                                             $unit_member_ids )) {
-                                echo " disabled";
-                            }
-                        }
-                        echo " value='" . $person->getId() . "'>&nbsp;";
-                        echo "</input>";
-                        echo "</td><td>";
-                        echo "<input type='text' size='15' name='edit_other-" . $person->getId() . "'";
-                        if ( $role == Utils::USER ) {
-                            if ( ! in_array( $person->getId(), 
-                                             $unit_member_ids )) {
-                                echo " disabled";
-                            }
-                        }
-                        if ( $attendee->getSpecialsOther() != '' ) {
-                            echo " value='" . $attendee->getSpecialsOther() . "' ";
-                        }
-                        echo "></input>";
-                        echo "</td>";
-                        if ( $role == Utils::MEALS_ADMIN ) {
-                            echo "<td>";
-                            echo "$<input type='number' step='.10' name='extra_cost-" . $person->getId() . "'";
-                            if ( $attendee->getExtraCost() != '' ) {
-                                echo " value='" . number_format( $attendee->getExtraCost(), 2 ) . "' ";
-                            }
-                            echo "></input>";
-                            echo "</td>";
-                        }
-                        echo "</td></tr>";
-                    }   
+                if ( $member_attendees ) {
+                    show_member_attendees( $member_attendees, $unit_member_ids );
+                }
+                if ( $guests ) {
+                    show_guests( $guests, $unit_id );
                 }
             ?> 
             <tr>
@@ -236,16 +321,23 @@ function error_field($title, array $errors) {
       </tr>
       <tr>
         <th>Adult</th>
-        <th>0-5</th>
-        <th>6-12</th>
+        <th colspan="2">Child</th>
+        <th/>
+        <th/>
+        <th/>
+      </tr>
+        <th/>
+        <th>Young</th>
+        <th>Older</th>
         <th/>
         <th/>
         <th/>
       </tr>
       <tr>
+      <tr>
         <td class="summary_cell"><?php echo $count_adults;?>&nbsp;</td>
-        <td class="summary_cell"><?php echo $count_0_5;?>&nbsp;</td>
-        <td class="summary_cell"><?php echo $count_6_12;?>&nbsp;</td>
+        <td class="summary_cell"><?php echo $count_child_young;?>&nbsp;</td>
+        <td class="summary_cell"><?php echo $count_child_older;?>&nbsp;</td>
         <td class="summary_cell"><?php echo $count_veg;?>&nbsp;</td>
         <td class="summary_cell"><?php echo $count_gf;?>&nbsp;</td>
         <td class="summary_cell"><?php echo $count_df;?></td>
@@ -258,10 +350,17 @@ function error_field($title, array $errors) {
     </table>
 </div>
 <p>
-    <?php $backLink = Utils::createLink('meal-list', array()); ?>
-    <a href="<?php echo $backLink; ?>"><img src="img/action/back.png" alt="" title="Back to the list." class="icon"/></a>&nbsp;
-    <a class="button" href="<?php echo $backLink; ?>">To the list</a>
-    <form action="#" method="post">
-        <input type="submit" name="download_report" value="Download"/>
-    </form>
+    <div>
+        <form action="#" method="post">
+            <input type="submit" name="download_attendees" value="Download Attendees"/>
+        </form>
+        <form action="#" method="post">
+            <input type="submit" name="download_units" value="Download By Unit"/>
+        </form>
+    </div>
+    <div>
+        <?php $backLink = Utils::createLink('meal-list', array()); ?>
+        <a href="<?php echo $backLink; ?>"><img src="img/action/back.png" alt="" title="Back to the list." class="icon"/></a>&nbsp;
+        <a class="button" href="<?php echo $backLink; ?>">To the list</a>
+    </div>
 </p>

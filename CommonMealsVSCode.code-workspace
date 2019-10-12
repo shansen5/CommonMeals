@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "CommonMeals",
+			"path": "CommonMeals"
+		}
+	],
+	"settings": {
+		"php.validate.executablePath": "/usr/bin/php",
+		"php.validate.run": "onType"
+	}
+}

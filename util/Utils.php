@@ -171,15 +171,27 @@ final class Utils {
     }
 
     /**
-     * @return array of MealAttendees
+     * @return array of MemberAttendees
      * @throws NotFoundException if the param or {@link Unit} instance is not found
      */
-    public static function getMealAttendeesByMealId( $id ) {
-        $dao = new MealAttendeeDao();
-        $search = new MealAttendeeSearchCriteria();
+    public static function getMemberAttendeesByMealId( $id ) {
+        $dao = new MemberAttendeeDao();
+        $search = new MemberAttendeeSearchCriteria();
         $search->setMealId( $id );
         $attendees = $dao->find( $search );
         return $attendees;
+    }
+
+    /**
+     * @return array of Guests
+     * @throws NotFoundException if the param or {@link Unit} instance is not found
+     */
+    public static function getGuestsByMealId( $id ) {
+        $dao = new GuestDao();
+        $search = new GuestSearchCriteria();
+        $search->setMealId( $id );
+        $guests = $dao->find( $search );
+        return $guests;
     }
 
     /**

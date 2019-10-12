@@ -5,6 +5,10 @@
  */
 abstract class AbstractMealAttendee extends AbstractModel {
    
+    const AGE_ADULT = 'adult';
+    const AGE_CHILD_YOUNG = 'child-young';
+    const AGE_CHILD_OLDER = 'child-older';
+
     const VEGETARIAN = "vegetarian";
     const GLUTEN_FREE = "gluten";
     const DAIRY_FREE = "dairy";
@@ -20,6 +24,12 @@ abstract class AbstractMealAttendee extends AbstractModel {
     private $specials_gf;
     private $specials_df;
     private $specials_other;
+
+    private $age_group;
+
+    public static function getAgeGroups() {
+        return array( self::AGE_ADULT, self::AGE_CHILD_YOUNG, self::AGE_CHILD_OLDER, );
+    }
 
     /**
      * Create new {@link Item} with default properties set.
@@ -98,4 +108,15 @@ abstract class AbstractMealAttendee extends AbstractModel {
         return $this->specials_other;
     }
 
+    /**
+     * @return string
+     */
+    public function getAgeGroup() {
+        return $this->age_group;
+    }
+
+    public function setAgeGroup( $age ) {
+        AttendeeValidator::validateAge( $age );
+        $this->age_group = $age;
+    }
 }

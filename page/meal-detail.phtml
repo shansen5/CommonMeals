@@ -25,12 +25,16 @@
                 <td><?php echo '$' . Utils::escape($meal->getMealCost()); ?></td>
             </tr>
             <tr>
-                <th>Ages 0 - 5</th>
+                <th>Young child</th>
                 <td><?php echo '$' . Utils::escape($meal->getMealCost1()); ?></td>
             </tr>
             <tr>
-                <th>Ages 6 - 12</th>
+                <th>Older child</th>
                 <td><?php echo '$' . Utils::escape($meal->getMealCost2()); ?></td>
+            </tr>
+            <tr>
+                <th>Sign Up Limit</th>
+                <td><?php echo Utils::escape($meal->getSignUpLimit()); ?></td>
             </tr>
             <tr>
                 <th>Date and Time</th>
@@ -46,12 +50,18 @@
             </tr>
             <tr>
                 <th>
-                    <a class='button' href="<?php 
+                    <?php
+                    $now = new DateTime();
+                    $deadline = $meal->getDeadlineDatetime();
+                    if ( $now < $deadline || $role === Utils::MEALS_ADMIN ) {
+                        echo "<a class='button' href='";
                         echo Utils::createLink('meal-signup', 
                                                 array(
                                                     'meal_id' => $meal->getId(), 
-                                                    'member_id'=> $_SESSION['oc_user'])) 
-                        ?>"> Sign Up </a>
+                                                    'member_id'=> $_SESSION['oc_user'])); 
+                        echo "'> Sign Up </a>";
+                    }
+                    ?>
                 </th>
             </tr>
             <div class="actions">
