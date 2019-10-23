@@ -119,7 +119,7 @@ function show_guests( $guests, $guest_unit_id ) {
         }
         echo " value='" . $guest->getId() . "'>&nbsp;";
         echo "Unit " . $guest->getUnitId() . " guest - " .
-             $guest->getGuestAge();
+             $guest->getAgeGroup();
         echo "</input>";
         echo "</td><td>";
         echo "<input type='checkbox' name='" . $edit_veg . "'";
@@ -197,8 +197,8 @@ function show_guests( $guests, $guest_unit_id ) {
         <?php echo 'Meal: ' . $meal->getSummary() .' - Team: ' 
             . Utils::getMealTeamLeads( $meal->getMealTeamId() ); ?>
     </h3>
-    <p>Date and Time:  <?php echo $meal->getDateTime(); ?></p>
-    <p>Signup by:  <?php echo $meal->getDeadline(); ?></p>
+    <p>Date and Time:  <?php echo $meal->getDateTimeMDY(); ?></p>
+    <p>Signup by:  <?php echo $meal->getDeadlineMDY(); ?></p>
     <p>Cost: $<?php echo $meal->getMealCost(); ?>, 
     <p>Young child: $<?php echo $meal->getMealCost1(); ?>, 
     <p>Older child: $<?php echo $meal->getMealCost2(); ?></p> 
@@ -233,16 +233,16 @@ function show_guests( $guests, $guest_unit_id ) {
                 <?php endif; ?>
                 <div class="field">
                     <label>Adults:</label>
-                    <input name='guest_adults' type='number' step='1' min='0'>
+                    <input name='guest_adults' type='number' step='1' min='0' value='0'>
                 </div>
                 <div class="field">
                     <label>Child (<8):</label>
-                    <input name='guest_child_young' type='number' step='1' min='0'>
+                    <input name='guest_child_young' type='number' step='1' min='0' value='0'>
                     <input type='submit' name='add_guest' value='Add'>
                 </div>
                 <div class="field">
                     <label>Child (8-11):</label>
-                    <input name='guest_child_older' type='number' step='1' min='0'>
+                    <input name='guest_child_older' type='number' step='1' min='0' value='0'>
                 </div>
                 <!-- <input type="hidden" name="guest_child_cost" value="0" > -->
             </fieldset>
@@ -351,12 +351,13 @@ function show_guests( $guests, $guest_unit_id ) {
 </div>
 <p>
     <div>
-        <form action="#" method="post">
-            <input type="submit" name="download_attendees" value="Download Attendees"/>
-        </form>
-        <form action="#" method="post">
-            <input type="submit" name="download_units" value="Download By Unit"/>
-        </form>
+        <?php 
+          if ( $role == Utils::MEALS_ADMIN ) {
+            echo '<form action="#" method="post">';
+            echo '<input type="submit" name="download_attendees" value="Download Attendees"/>';
+            echo '</form>';
+          }
+        ?>
     </div>
     <div>
         <?php $backLink = Utils::createLink('meal-list', array()); ?>

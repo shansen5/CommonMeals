@@ -8,9 +8,9 @@ if ($edit) {
     $meal = Utils::getMealByGetId();
     if ( $meal ) {
         $meal_team_id = $meal->getMealTeamId();
-        $meal_date_string = $meal->getDateTime()->format('Y-m-d');
+        $meal_date_string = $meal->getDateTime()->format('m-d-Y');
         $meal_time_string = $meal->getDateTime()->format('h:i a');
-        $deadline_date_string = $meal->getDeadline()->format('Y-m-d');
+        $deadline_date_string = $meal->getDeadline()->format('m-d-Y');
         $deadline_time_string = $meal->getDeadline()->format('h:i a');
         $meal_team_id = $meal->getMealTeamId();
     } 

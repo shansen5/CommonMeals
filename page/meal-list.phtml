@@ -28,8 +28,10 @@
                 <label>From:</label>
                 <input type="text" name="from_date" 
                     <?php if ( $_POST[ "from_date" ]) {
-                              echo 'value="' . $_POST[ 'from_date' ] . '" '; 
-                          }
+                            $mdy_date = Utils::createDateTimeFromString( $_POST["from_date"]);
+                            echo 'value="' . $mdy_date->format("m-d-Y") . '" '; 
+                          
+                        }
                     ?>
                     class = "text datepicker" />
             </div>
@@ -37,7 +39,8 @@
                 <label>To:</label>
                 <input type="text" name="to_date" 
                     <?php if ( $_POST[ "to_date" ]) {
-                              echo 'value="' . $_POST[ 'to_date' ] . '" '; 
+                            $mdy_date = Utils::createDateTimeFromString( $_POST["to_date"]);
+                            echo 'value="' . $mdy_date->format("m-d-Y") . '" '; 
                           }
                     ?>
                     class = "text datepicker" />
@@ -76,10 +79,10 @@
                     </a>
                 </td>
                 <td>
-                    <?php echo Utils::escape($meal->getDateTime()) ?>
+                    <?php echo Utils::escape($meal->getDateTimeMDY()) ?>
                 </td>
                 <td>
-                    <?php echo Utils::escape($meal->getDeadline()) ?>
+                    <?php echo Utils::escape($meal->getDeadlineMDY()) ?>
                 </td>
                 <td>
                     <?php

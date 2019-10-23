@@ -101,7 +101,7 @@ final class GuestDao extends AbstractDao {
         $num = count( $guests );
         $i = 1;
         foreach ( $guests as $guest ) {
-            $sql .= '( ' . $meal_id . ', ' . $guest->getUnitId() . ', "' . $guest->getGuestAge()
+            $sql .= '( ' . $meal_id . ', ' . $guest->getUnitId() . ', "' . $guest->getAgeGroup()
                      . '", "' . json_encode ( $guest->getSpecials() )
                      . '", '  . $guest->getExtraCost() . ')';
             if ( $i < $num ) {
@@ -174,7 +174,7 @@ final class GuestDao extends AbstractDao {
             ':id' => $attendee->getId(),
             ':meal_id' => $attendee->getMealId(),
             ':guest_unit_id' => $attendee->getUnitId(),
-            ':guest_age' => $attendee->getGuestAge(),
+            ':guest_age' => $attendee->getAgeGroup(),
             ':specials' => json_encode( $attendee->getSpecials() ),
             ':extra_cost' => $attendee->getExtraCost() 
         );

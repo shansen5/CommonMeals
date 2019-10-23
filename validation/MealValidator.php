@@ -19,10 +19,10 @@ final class MealValidator {
         if (!$meal->getSummary()) {
             $errors[] = new RError('summary', 'Summary cannot be empty.' );
         }
-        if (!$meal->getDateTime()) {
+        if (!$meal->getDateTimeMDY()) {
             $errors[] = new RError('meal_datetime', 'Meal date cannot be empty.' );
         }
-        if (!$meal->getDeadline()) {
+        if (!$meal->getDeadlineMDY()) {
             $errors[] = new RError('deadline', 'Signup deadline cannot be empty.' );
         }
         return $errors;

@@ -1,9 +1,9 @@
 <?php
 
-function add_members( $meal ) {
+function add_members( $meal, $person_ids ) {
     $dao = new MemberAttendeeDao();
     $attendees = array();
-    foreach ( $_POST[ 'add_attendees' ] as $person_id ) {
+    foreach ( $person_ids as $person_id ) {
         $attendee = new MemberAttendee();
         $attendee->setPersonId( $person_id );
         $attendee->setExtraCost( 0 );
@@ -18,7 +18,7 @@ function add_guests( $meal, $unit, $adults, $child_young, $child_older ) {
     $guests = array();
     for ( $i = 0; $i < $adults; $i++ ) {
         $guest = new Guest();
-        $guest->setAgeGroup( AbstractMealAttendee::GUEST_ADULT );
+        $guest->setAgeGroup( AbstractMealAttendee::AGE_ADULT );
         $guest->setUnitId( $unit );
         $guest->setExtraCost( 0 );
         $guests[] = $guest;
@@ -159,7 +159,7 @@ function count_guests( $guests, &$count_adults, &$count_child_young, &$count_chi
     }
 }
 
-function count_specials( $attendee, &$count_veg, &$count_gf, &$countdf ) {
+function count_specials( $attendee, &$count_veg, &$count_gf, &$count_df ) {
     if ( $attendee->getSpecialsVeg() ) {
         $count_veg++;
     }
@@ -220,9 +220,12 @@ if (array_key_exists('cancel', $_POST)) {
     }
 } elseif (array_key_exists('add_member', $_POST)) {
     // save
-    if ( array_key_exists( 'add_attendees', $_POST )) {
-        $success = add_members( $meal );
-
+    $total_count = $count_adults + $count_child_young + $count_child_older;
+    $person_ids = $_POST[ 'add_attendees' ];
+    if ( count( $person_ids ) + $total_count > $meal->getSignUpLimit() ) {
+        Flash::addFlash( 'Meal sign up limit exceeded' );
+    } elseif  ( array_key_exists( 'add_attendees', $_POST )) {
+        $success = add_members( $meal, $person_ids );
         if ( $success ) {
             Flash::addFlash('Attendees saved successfully.');
         } else {
@@ -232,15 +235,22 @@ if (array_key_exists('cancel', $_POST)) {
     Utils::redirect( 'meal-signup', array('meal_id' => $meal->getId()));
 } elseif (array_key_exists('add_guest', $_POST)) {
     // save
-    $guest_unit = $unit_id;
-    if (array_key_exists('guest_unit', $_POST)) {
-        $guest_unit = $_POST['guest_unit'];
-    }
-    $success = add_guests($meal, $guest_unit, $_POST['guest_adults'], $_POST['guest_child_young'], $_POST['guest_child_older']);
-    if ( $success ) {
-        Flash::addFlash('Guests saved successfully.');
+    $total_count = $count_adults + $count_child_young + $count_child_older;
+    $total_to_add = $_POST['guest_adults'] + $_POST['guest_child_young']
+                        + $_POST['guest_child_older'];
+    if ( $total_count + $total_to_add > $meal->getSignUpLimit() ) {
+        Flash::addFlash( 'Meal sign up limit exceeded' );
     } else {
-        Flash::addFlash('Guests could not be added.');
+    $guest_unit = $unit_id;
+        if (array_key_exists('guest_unit', $_POST)) {
+            $guest_unit = $_POST['guest_unit'];
+        }
+        $success = add_guests($meal, $guest_unit, $_POST['guest_adults'], $_POST['guest_child_young'], $_POST['guest_child_older']);
+        if ( $success ) {
+            Flash::addFlash('Guests saved successfully.');
+        } else {
+            Flash::addFlash('Guests could not be added.');
+        }
     }
     Utils::redirect( 'meal-signup', array('meal_id' => $meal->getId()));
 } elseif (array_key_exists('edit', $_POST)) {
@@ -313,74 +323,8 @@ if (array_key_exists('cancel', $_POST)) {
     }
     Utils::redirect( 'meal-signup', array('meal_id' => $meal->getId()));
 } elseif ( array_key_exists( 'download_attendees', $_POST )) {
-    download_attendees( $role, $meal, $member_attendees );
+    $meal->downloadAttendeesReport( $role, $member_attendees, $guests );
 } elseif ( array_key_exists( 'download_units', $_POST )) {
+    $meal->downloadUnitsReport( $role, $member_attendees, $guests );
     download_units( $role, $meal, $member_attendees );
 }
-
-function download_attendees( $role, $meal, $attendees ) {
-    $dir = getcwd();
-    $filename = 'logs/meal_attendees_report-' . date('Y-m-d-H-mi') . '.csv';
-    $handle = fopen( $filename, 'w' );
-    if ( $handle ) {
-        fwrite( $handle, "Meal:, " . $meal->getSummary() . "\n" );
-        fwrite( $handle, "Team:, " . Utils::getMealTeamLeads( $meal->getMealTeamId() ) . "\n");
-        fwrite( $handle, "Date and Time:, " . $meal->getDateTime() . "\n");
-        fwrite( $handle, "Signup by:, " . $meal->getDeadline() . "\n");
-        fwrite( $handle, "Cost:, " . $meal->getMealCost() . "\n");
-        fwrite( $handle, "Young child:, " . $meal->getMealCost1() . "\n");
-        fwrite( $handle, "Older child:, " . $meal->getMealCost2() . "\n");
-        fwrite( $handle, "\n" );
-        fwrite( $handle, "Name, Age, Veg, GF, DF, Allergies" );
-        if ( $role === Utils::MEALS_ADMIN ) {
-            fwrite( $handle, ", Extra Cost\n" );
-        } else {
-            fwrite( $handle, "\n" );
-        }
-        foreach( $attendees as $attendee ) {
-            $person = $attendee->getPerson();
-            fwrite( $handle, $person->getFirstName() . " " . $person->getLastName() . "," );
-            fwrite( $handle, "age" );
-            if ( $role === Utils::MEALS_ADMIN ) {
-                fwrite( $handle, $attendee->getExtraCost() );
-            } else {
-                fwrite( $handle, "\n" );
-            }
-        }
-    }
-    fclose( $handle );
-    make_header( $filename );
-}
-
-function download_units( $role, $meal, $attendees ) {
-    $dir = getcwd();
-    $filename = 'logs/meal_units_report-' . date('Y-m-d-H-mi') . '.csv';
-    $handle = fopen( $filename, 'w' );
-    if ( $handle ) {
-        fwrite( $handle, "Unit,, Count,,," );
-        if ( $role === Utils::MEALS_ADMIN ) {
-            fwrite( $handle, ", Cost\n" );
-        } else {
-            fwrite( $handle, "\n" );
-        }
-        fwrite( $handle, ", Adult, Young Child, Older Child\n");
-    }
-    fclose( $handle );
-    make_header( $filename );
-}
-
-function make_header( $filename ) {
-    if (file_exists($filename)) {
-        header('Content-Description: File Transfer');
-        header('Content-Type: application/text');
-        header('Content-Disposition: attachment; filename="'.basename($filename).'"');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate');
-        header('Pragma: public');
-        header('Content-Length: ' . filesize($filename));
-        readfile($filename);
-        // exit;
-    }
-    unlink( $filename );
-}
-

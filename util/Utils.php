@@ -26,6 +26,20 @@ final class Utils {
     }
 
     /**
+     * Create DateTime from string of one of two formats 
+     * 'm-d-Y' or 'Y-m-d'
+     * @param string in one of the two formats
+     * @return DateTime
+     */
+    public static function createDateTimeFromString( $str ) {
+        $dt = DateTime::createFromFormat( 'm-d-Y', $str );
+        if ( ! $dt ) {
+            $dt = DateTime::createFromFormat( 'Y-m-d', $str );
+        }
+        return $dt;
+    }
+
+    /**
      * Format date.
      * @param DateTime $date date to be formatted
      * @return string formatted date

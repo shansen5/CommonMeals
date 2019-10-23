@@ -113,20 +113,38 @@ final class Meal extends AbstractModel {
     }
 
     /**
-     * @return DateTime
+     * @return DateTime as string formatted m-d-Y
      */
-    public function getDateTime() {
+    public function getDateTimeMDY() {
+        if ( ! $this->meal_datetime ) {
+            return '';
+        }
+        // return $this->meal_datetime->format( 'Y-m-d H:i');
+        return $this->meal_datetime->format( 'm-d-Y g:i A');
+    }
+
+    /**
+     * @return DateTime as string formatted Y-m-d
+     */
+    public function getDateTimeYMD() {
         if ( ! $this->meal_datetime ) {
             return '';
         }
         return $this->meal_datetime->format( 'Y-m-d H:i');
     }
 
-    public function getDate() {
+    public function getDateYMD() {
         if ( ! $this->meal_datetime ) {
             return '';
         }
         return $this->meal_datetime->format( 'Y-m-d');
+    }
+
+    public function getDateMDY() {
+        if ( ! $this->meal_datetime ) {
+            return '';
+        }
+        return $this->meal_datetime->format( 'm-d-Y');
     }
 
     public function getTime() {
@@ -160,7 +178,14 @@ final class Meal extends AbstractModel {
         );
     }
 
-    public function getDeadlineDate() {
+    public function getDeadlineDateMDY() {
+        if ( ! $this->deadline ) {
+            return '';
+        }
+        return $this->deadline->format( 'm-d-Y g:i A');
+    }
+
+    public function getDeadlineDateYMD() {
         if ( ! $this->deadline ) {
             return '';
         }
@@ -172,12 +197,23 @@ final class Meal extends AbstractModel {
             return '';
         }
         return $this->deadline->format( 'H:i');
+        // return $this->deadline->format( 'g:i A');
     }
 
     /**
      * @return DateTime
      */
-    public function getDeadline() {
+    public function getDeadlineMDY() {
+        if ( ! $this->deadline ) {
+            return '';
+        }
+        return $this->deadline->format( 'm-d-Y H:i');
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getDeadlineYMD() {
         if ( ! $this->deadline ) {
             return '';
         }
@@ -220,4 +256,150 @@ final class Meal extends AbstractModel {
     public function setTeamLead( $name ) {
         $this->team_lead = $name;
     }
+
+    public function downloadAttendeesReport( $role, $attendees, $guests ) {
+        $dir = getcwd();
+        $filename = 'logs/meal_attendees_report-' . date('Y-m-d-H-mi') . '.csv';
+        $handle = fopen( $filename, 'w' );
+        if ( $handle ) {
+            fwrite( $handle, "Meal:," . $this->getSummary() . "\n" );
+            fwrite( $handle, "Team:," . Utils::getMealTeamLeads( $this->getMealTeamId() ) . "\n");
+            fwrite( $handle, "Date and Time:," . $this->getDateTimeMDY() . "\n");
+            fwrite( $handle, "Signup by:," . $this->getDeadlineMDY() . "\n");
+            fwrite( $handle, "Cost:," . $this->getMealCost() . "\n");
+            fwrite( $handle, "Young child:," . $this->getMealCost1() . "\n");
+            fwrite( $handle, "Older child:," . $this->getMealCost2() . "\n");
+            fwrite( $handle, "\n" );
+            fwrite( $handle, "Unit,Name,Age,Veg,GF,DF,Allergies" );
+            if ( $role === Utils::MEALS_ADMIN ) {
+                fwrite( $handle, ",Extra Cost,Total Cost,Unit Total\n" );
+            } else {
+                fwrite( $handle, "\n" );
+            }
+            $total_income = 0;
+            $count_adult = 0;
+            $count_child_young = 0;
+            $count_child_older = 0;
+            $records = array();
+            foreach( $attendees as $attendee ) {
+                $person = $attendee->getPerson();
+                $name = $person->getFirstName() . " " . 
+                            $person->getLastName() . ",";
+                $cost = 0;
+                $line = $this->writeAbstractAttendee( $role, $attendee, 
+                            $count_adult, $count_child_young, 
+                            $count_child_older, $count_veg, $count_gf,
+                            $count_df, $cost );
+                $record = array( 'unit' => $person->getUnit(),
+                                 'line' => $name . $line,
+                                 'cost' => $cost ); 
+                $records[] = $record;
+            }
+            foreach( $guests as $guest ) {
+                $name = "Guest,";
+                $cost = 0;
+                $line = $this->writeAbstractAttendee( $role, $guest, 
+                            $count_adult, $count_child_young, 
+                            $count_child_older, $count_veg, $count_gf,
+                            $count_df, $cost );
+                $record = array( 'unit' => (int)$guest->getUnitId(),
+                                 'line' => $name . $line,
+                                 'cost' => $cost ); 
+                $records[] = $record;
+            }
+            usort( $records, function( $i1, $i2 ) {
+                return( $i1['unit'] <=> $i2['unit'] );
+            });
+            $unit = 0;
+            $unit_cost = 0;
+            foreach( $records as $arecord ) {
+                if ( $arecord['unit'] === $unit ) {
+                    $unit_cost += $arecord['cost'];
+                } else {
+                    if ( $unit != 0 ) {
+                        fwrite( $handle, ",,,,,,,,," . $unit_cost . "\n" );
+                    }
+                    $unit = $arecord['unit'];
+                    $unit_cost = $arecord['cost'];
+                }
+                fwrite( $handle, $arecord['unit'] . "," . $arecord['line'] . 
+                                 $arecord['cost'] . "\n" );
+                $total_income += $arecord['cost'];
+            }
+            if ( $unit != 0 ) {
+                fwrite( $handle, ",,,,,,,,," . $unit_cost . "\n" );
+            }
+            fwrite( $handle, "\nAdults:," . $count_adult . "\n" );
+            fwrite( $handle, "Young Child:," . $count_child_young . "\n" );
+            fwrite( $handle, "Older Child:," . $count_child_older . "\n" );
+            fwrite( $handle, "\nVeg:," . $count_veg . "\n" );
+            fwrite( $handle, "GF:," . $count_gf . "\n" );
+            fwrite( $handle, "DF:," . $count_df . "\n" );
+            if ( $role === Utils::MEALS_ADMIN ) {
+                fwrite( $handle, "\nTotal income:," . $total_income );
+            }
+        }
+        fclose( $handle );
+        $this->makeHeader( $filename );
+    }
+
+    // Return CSV string of the record
+    private function writeAbstractAttendee( $role, $attendee, 
+                                    &$count_adult, &$count_child_young, 
+                                    &$count_child_older, &$count_veg, 
+                                    &$count_gf, &$count_df,
+                                    &$attendee_cost ) {
+        $age_group = $attendee->getAgeGroup();
+        $result = $age_group . ",";
+        $count_veg += $this->writeSpecial( $result, $attendee->getSpecialsVeg() );
+        $count_gf += $this->writeSpecial( $result, $attendee->getSpecialsGF() );
+        $count_df += $this->writeSpecial( $result, $attendee->getSpecialsDF() );
+        $result .= $attendee->getSpecialsOther() . ",";
+        if ( $role === Utils::MEALS_ADMIN ) {
+            $result .= $attendee->getExtraCost() . ",";
+        }
+        if ( $age_group === AbstractMealAttendee::AGE_ADULT ) {
+            $count_adult++;
+            if ( $role === Utils::MEALS_ADMIN ) {
+                $attendee_cost = $this->getMealCost() + $attendee->getExtraCost();
+            }
+        } elseif ( $age_group === AbstractMealAttendee::AGE_CHILD_OLDER ) {
+            $count_child_older++;
+            if ( $role === Utils::MEALS_ADMIN ) {
+                $attendee_cost = $this->getMealCost2() + $attendee->getExtraCost();
+            }
+        } else {
+            $count_child_young++;
+            if ( $role === Utils::MEALS_ADMIN ) {
+                $attendee_cost = $this->getMealCost1() + $attendee->getExtraCost();
+            }
+        }
+        return $result;
+    }
+
+    private function writeSpecial( &$result, $special ) {
+        $checked = 0;
+        if ( $special ) {
+            $result .= "X";
+            $checked = 1;
+        }
+        $result .= ",";
+        return $checked;
+    }
+
+    private function makeHeader( $filename ) {
+        if (file_exists($filename)) {
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/text');
+            header('Content-Disposition: attachment; filename="'.basename($filename).'"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($filename));
+            readfile($filename);
+            // exit;
+        }
+        unlink( $filename );
+    }
+
 }

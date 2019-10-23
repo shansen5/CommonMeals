@@ -13,9 +13,9 @@ if ($edit) {
     $meal = Utils::getMealByGetId();
     if ( $meal ) {
         $meal_team_id = $meal->getMealTeamId();
-        $meal_date_string = $meal->getDate();
+        $meal_date_string = $meal->getDateYMD();
         $meal_time_string = $meal->getTime();
-        $deadline_date_string = $meal->getDeadlineDate();
+        $deadline_date_string = $meal->getDeadlineDateYMD();
         $deadline_time_string = $meal->getDeadlineTime();
     } 
 } else {
