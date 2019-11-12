@@ -248,9 +248,6 @@ final class Utils {
         }
         $dao = new MealDao();
         $meal = $dao->findById($id);
-        if ($meal === null) {
-            throw new NotFoundException('Unknown Meal identifier provided.');
-        }
         return $meal;
     }
 

@@ -30,6 +30,13 @@ final class Meal extends AbstractModel {
 
     private $team_lead;
 
+    function __construct() {
+        $this->meal_cost = 0.00;
+        $this->meal_cost_1 = 0.00;
+        $this->meal_cost_2 = 0.00;
+        $this->sign_up_limit = 40;
+    }
+
     //~ Getters & setters
 
     /**
@@ -308,7 +315,13 @@ final class Meal extends AbstractModel {
                 $records[] = $record;
             }
             usort( $records, function( $i1, $i2 ) {
-                return( $i1['unit'] <=> $i2['unit'] );
+                if ( $i1['unit'] < $i2['unit'] ) {
+                    return -1;
+                } else if ( $i1['unit'] > $i2['unit'] ) {
+                    return 1;
+                }
+                return 0;
+                // return( $i1['unit'] <=> $i2['unit'] );
             });
             $unit = 0;
             $unit_cost = 0;

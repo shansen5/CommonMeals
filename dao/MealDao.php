@@ -74,10 +74,10 @@ final class MealDao extends AbstractDao {
     public function insert( AbstractModel $meal ) {
         $meal->setId( null );
         $sql = '
-            INSERT INTO meals (id, meal_team_id, summary, details, 
+            INSERT INTO meals ( meal_team_id, summary, details, 
                 meal_datetime, tags, person_id, deadline, meal_cost, 
                 meal_cost_1, meal_cost_2, sign_up_limit)
-                VALUES (:id, :meal_team_id, :summary, :details, 
+                VALUES ( :meal_team_id, :summary, :details, 
                 :meal_datetime, :tags, :person_id, :deadline,
                 :meal_cost, :meal_cost_1, :meal_cost_2, :sign_up_limit)';
         return $this->execute( $sql, $meal );
@@ -103,7 +103,7 @@ final class MealDao extends AbstractDao {
                 sign_up_limit = :sign_up_limit
             WHERE
                 id = :id';
-        return $this->execute( $sql, $meal );
+        return $this->execute( $sql, $meal, true );
     }
 
     protected function getFindSql( AbstractSearchCriteria $search = null ) {
@@ -131,7 +131,6 @@ final class MealDao extends AbstractDao {
 
     protected function getParams( AbstractModel $meal, $update = false ) {
         $params = array(
-            ':id' => $meal->getId(),
             ':meal_team_id' => $meal->getMealTeamId(),
             ':summary' => $meal->getSummary(),
             ':details' => $meal->getDetails(),
@@ -144,6 +143,9 @@ final class MealDao extends AbstractDao {
             ':meal_cost_2' => $meal->getMealCost2(),
             ':sign_up_limit' => $meal->getSignUpLimit()
         );
+        if ( $update ) {
+            $params[ ':id' ] = $meal->getId();
+        }
         return $params;
     }
 

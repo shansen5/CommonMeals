@@ -4,11 +4,11 @@
     padding: 0;
 }
 body {
-    background: /*url(../img/header-bg-left.jpg) repeat-x top*/ #b7c9e0;
+    background: /*url(../img/header-bg-left.jpg) repeat-x top*/ #998787;
     font-family: Tahoma, Geneva, sans-serif;
     font-size: 100%;
     line-height: 1em;
-    color: #414141;
+    color: #0e0202;
 }
 
 h1 {
@@ -19,11 +19,11 @@ h2 {
 }
 h3 {
     font-size: 1em;
-    color: #4c7cbd;
+    color: #3c0808;
     margin-bottom: 12px;
 }
 h3 a {
-    color: #4c7cbd;
+    color: #3c0808;
     text-decoration: none;
 }
 h3 a:hover {
@@ -111,7 +111,7 @@ label {
     line-height: 18px;
     padding-bottom: 8px;
     font-weight: bold;
-    color: #4c7cbd;
+    color: #3c0808;
 }
 input.text {
     width: 170px;
@@ -132,14 +132,14 @@ textarea {
 }
 form input.submit {
     float: right;
-    color: #4c7cbd;
+    color: #3c0808;
     margin-right: 5px;
     width: 70px;
     font-weight: bold;
 }
 form input.submit-left {
     float: left;
-    color: #4c7cbd;
+    color: #3c0808;
     margin-left: 5px;
     width: 90px;
     font-weight: bold;
@@ -183,7 +183,7 @@ form input.submit-left {
     position: relative; top: -4px;
 }
 #footer a {
-    color: #4c7cbd;
+    color: #3c0808;
 }
 
 /** other **/
@@ -235,7 +235,7 @@ form input.submit-left {
     top: 0;
     width: 50%;
     height: 244px;
-    background: /*url(../img/header-bg-right.jpg) repeat-x right top*/ #b7c9e0;
+    background: /*url(../img/header-bg-right.jpg) repeat-x right top*/ #998787;
 }
 
 .statuses {

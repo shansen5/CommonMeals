@@ -76,17 +76,17 @@ function error_field($title, array $errors) {
         <div class="field">
             <label>Meal Cost:</label>
             $<input type="number" name="meal[meal_cost]" step="0.10" placeholder="0.00"
-                value='<?php echo $meal->getMealCost(); ?>'/>
+                value='<?php echo $meal ? $meal->getMealCost() : "0.00"; ?>'/>
         </div>
         <div class="field">
             <label>Meal Cost (0 - 5):</label>
             $<input type="number" name="meal[meal_cost_1]" step="0.10" placeholder="0.00"
-                value='<?php echo $meal->getMealCost1(); ?>'/>
+                value='<?php echo $meal ? $meal->getMealCost1() : "0.00"; ?>'/>
         </div>
         <div class="field">
             <label>Meal Cost (6-12):</label>
             $<input type="number" name="meal[meal_cost_2]" step="0.10" placeholder="0.00"
-                value='<?php echo $meal->getMealCost2(); ?>'/>
+                value='<?php echo $meal ? $meal->getMealCost2() : "0.00"; ?>'/>
         </div>
         <div class="field">
             <label>Meal Date:</label>

@@ -41,7 +41,7 @@ final class PersonNameDao extends AbstractDao {
      * @param PersonName $person_name {@link PersonName} to be saved
      * @return PersonName saved {@link PersonName} instance
      */
-    public function save( $person_name ) {
+    public function save( AbstractModel $person_name ) {
         if ( $person_name->getId() === null ) {
             return $this->insert($person_name);
         }
@@ -152,8 +152,8 @@ final class PersonNameDao extends AbstractDao {
             ':person_id' => $person_name->getPersonId(),
             ':first_name' => $person_name->getFirstName(),
             ':last_name' => $person_name->getLastName(),
-            ':start_date' => $person_name->getStartDate()->format(DateTime::ISO8601),
-            ':end_date' => $person_name->getEndDate() === null ? null : $person_name->getEndDate()->format(DateTime::ISO8601)
+            ':start_date' => $person_name->getStartDate()->format( 'Y-m-d' ),
+            ':end_date' => $person_name->getEndDate() === null ? null : $person_name->getEndDate()->format( 'Y-m-d' )
         );
         if ( $update ) {
             $params[ ':id'] = $person_name->getId();

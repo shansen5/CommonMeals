@@ -161,8 +161,8 @@ final class UnitPersonDao extends AbstractDao {
         $params = array(
             ':unit_id' => $unit_person->getUnitId(),
             ':person_id' => $unit_person->getPersonId(),
-            ':start_date' => $unit_person->getStartDate()->format(DateTime::ISO8601),
-            ':end_date' => $unit_person->getEndDate() ? $unit_person->getEndDate()->format(DateTime::ISO8601) : null,
+            ':start_date' => $unit_person->getStartDate()->format( 'Y-m-d' ),
+            ':end_date' => $unit_person->getEndDate() ? $unit_person->getEndDate()->format( 'Y-m-d' ) : null,
             ':type' => $unit_person->getOccupantType()
         );
         if ( $update ) {

@@ -13,6 +13,28 @@
     ?>
 </h1>
 
+<?php
+    if ( $role == Utils::MEALS_ADMIN ) {
+        echo '<table class="detail">';
+        echo '    <tr>';
+        echo '        <th>Actions</th>';
+        echo '        <td>';
+        echo '            <div class="actions">';
+        $link = '<a href="' . Utils::createLink("add-edit-meal",
+                array('meal_id' => $meal->getId())) .
+                '"><img src="img/action/edit.png" alt="" title="Edit Meal" class="icon" /></a>';
+        echo $link;
+        $link = '<a href="' . Utils::createLink("meal-delete", 
+                array('meal_id' => $meal->getId())) .
+                '" id="delete-link"><img src="img/action/delete.png" alt="" title="Delete it." class="icon" /></a>';
+        echo $link;
+        echo '            </div>';
+        echo '        </td>';
+        echo '    </tr>';
+        echo '</table>';
+    }
+?>
+
 <table class="detail">
     <tr>
         <td>
@@ -64,10 +86,6 @@
                     ?>
                 </th>
             </tr>
-            <div class="actions">
-                <a href="<?php echo Utils::createLink('add-edit-meal', array('meal_id' => $meal->getId())); ?>"><img src="img/action/edit.png" alt="" title="Edit it." class="icon" /></a>
-                <a href="<?php echo Utils::createLink('meal-delete', array('id' => $meal->getId())); ?>" id="delete-link"><img src="img/action/delete.png" alt="" title="Delete it." class="icon" /></a>
-            </div>
         </td>
     </tr>
 </table>

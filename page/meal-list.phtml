@@ -8,49 +8,51 @@
 
 ?>
 
-<table class="detail">
-    <tr>
-        <th>Actions</th>
-        <td>
-            <div class="actions">
-                <a href="<?php
-                echo Utils::createLink('add-edit-meal');
-                ?>"><img src="img/action/add.png" alt="" title="Add Meal" class="icon" /></a>
-            </div>
-        </td>
-    </tr>
-</table>
+<?php if ( $role == Utils::MEALS_ADMIN ): ?>
+    <table class="detail">
+        <tr>
+            <th>Actions</th>
+            <td>
+                <div class="actions">
+                    <a href=' <?php echo Utils::createLink("add-edit-meal") ?>
+                '><img src='img/action/add.png' alt='' title='Add Meal' class='icon' /></a>"
+                </div>
+            </td>
+        </tr>
+    </table>
+    }
 
-<div id="onecolwrapper">
-    <form action="#" method="post">
-        <fieldset>
-            <div class="field">
-                <label>From:</label>
-                <input type="text" name="from_date" 
-                    <?php if ( $_POST[ "from_date" ]) {
-                            $mdy_date = Utils::createDateTimeFromString( $_POST["from_date"]);
-                            echo 'value="' . $mdy_date->format("m-d-Y") . '" '; 
-                          
-                        }
-                    ?>
-                    class = "text datepicker" />
-            </div>
-            <div class="field">
-                <label>To:</label>
-                <input type="text" name="to_date" 
-                    <?php if ( $_POST[ "to_date" ]) {
-                            $mdy_date = Utils::createDateTimeFromString( $_POST["to_date"]);
-                            echo 'value="' . $mdy_date->format("m-d-Y") . '" '; 
-                          }
-                    ?>
-                    class = "text datepicker" />
-            </div>
-            <div class="wrapper">
-                <input type="submit" name="save" value="FILTER" class="submit" />
-            </div>
-        </fieldset>
-    </form>
-</div>
+    <div id="onecolwrapper">
+        <form action="#" method="post">
+            <fieldset>
+                <div class="field">
+                    <label>From:</label>
+                    <input type="text" name="from_date" 
+                        <?php if ( $_POST[ "from_date" ]) {
+                                $mdy_date = Utils::createDateTimeFromString( $_POST["from_date"]);
+                                echo 'value="' . $mdy_date->format("m-d-Y") . '" '; 
+                              
+                            }
+                        ?>
+                        class = "text datepicker" />
+                </div>
+                <div class="field">
+                    <label>To:</label>
+                    <input type="text" name="to_date" 
+                        <?php if ( $_POST[ "to_date" ]) {
+                                $mdy_date = Utils::createDateTimeFromString( $_POST["to_date"]);
+                                echo 'value="' . $mdy_date->format("m-d-Y") . '" '; 
+                              }
+                        ?>
+                        class = "text datepicker" />
+                </div>
+                <div class="wrapper">
+                    <input type="submit" name="save" value="FILTER" class="submit" />
+                </div>
+            </fieldset>
+        </form>
+    </div>
+<?php endif; ?>
 
 
 <?php if (empty($meals)): ?>
@@ -59,9 +61,9 @@
     <table class="detail">
         <tr>
             <th>Team</th>
-            <th>Summary</th>
-            <th>Date/Time</th>
-            <th>Deadline</th>
+            <th>Meal Summary</th>
+            <th>Meal Date & Time</th>
+            <th>Sign Up Deadline</th>
         </tr>
         </th>
         <?php foreach ($meals as $meal): ?>

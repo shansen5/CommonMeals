@@ -26,7 +26,7 @@ abstract class AbstractDao {
     /**
      * @return PDO
      */
-    private function getDb() {
+    protected function getDb() {
         if ($this->db !== null) {
             return $this->db;
         }
