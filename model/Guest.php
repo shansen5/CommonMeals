@@ -5,7 +5,7 @@
  */
 final class Guest extends AbstractMealAttendee {
 
-    /** @var int */
+    /** @var string */
     private $unit_id;
 
     //~ getters & setters

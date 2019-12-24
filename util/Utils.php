@@ -165,7 +165,9 @@ final class Utils {
         if ( $person === null ) {
             throw new NotFoundException( 'Unknown person id' );
         }
-        return $person->getUnit();
+        $result = array( 'unit_id' => $person->getUnit(),
+                         'sub_unit' => $person->getSubUnit() );
+        return $result;
     }
 
     /**
@@ -178,7 +180,8 @@ final class Utils {
         $search->setSearchDate( new DateTime() );
         $search->setOrderByName();
         if ( $id ) {
-            $search->setUnitId( $id );
+            $search->setUnitId( $id['unit_id'] );
+            $search->setSubUnit( $id['sub_unit'] );
         }
         $persons = $dao->find( $search );
         return $persons;

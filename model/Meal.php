@@ -266,7 +266,7 @@ final class Meal extends AbstractModel {
 
     public function downloadAttendeesReport( $role, $attendees, $guests ) {
         $dir = getcwd();
-        $filename = 'logs/meal_attendees_report-' . date('Y-m-d-H-mi') . '.csv';
+        $filename = 'logs/meal_attendees_report-' . date('Y-m-d-H-mi') . '.xls';
         $handle = fopen( $filename, 'w' );
         if ( $handle ) {
             fwrite( $handle, "Meal:," . $this->getSummary() . "\n" );
@@ -297,7 +297,7 @@ final class Meal extends AbstractModel {
                             $count_adult, $count_child_young, 
                             $count_child_older, $count_veg, $count_gf,
                             $count_df, $cost );
-                $record = array( 'unit' => $person->getUnit(),
+                $record = array( 'unit' => $person->getUnit() . $person->getSubUnit(),
                                  'line' => $name . $line,
                                  'cost' => $cost ); 
                 $records[] = $record;
@@ -309,15 +309,15 @@ final class Meal extends AbstractModel {
                             $count_adult, $count_child_young, 
                             $count_child_older, $count_veg, $count_gf,
                             $count_df, $cost );
-                $record = array( 'unit' => (int)$guest->getUnitId(),
+                $record = array( 'unit' => $guest->getUnitId(),
                                  'line' => $name . $line,
                                  'cost' => $cost ); 
                 $records[] = $record;
             }
             usort( $records, function( $i1, $i2 ) {
-                if ( $i1['unit'] < $i2['unit'] ) {
+                if ( (int)$i1['unit'] < (int)$i2['unit'] ) {
                     return -1;
-                } else if ( $i1['unit'] > $i2['unit'] ) {
+                } else if ( (int)$i1['unit'] > (int)$i2['unit'] ) {
                     return 1;
                 }
                 return 0;

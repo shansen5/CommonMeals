@@ -76,6 +76,7 @@ function show_member_attendees( $member_attendees, $unit_member_ids ) {
         }
         echo " value='" . $person->getId() . "'>&nbsp;";
         echo "</input>";
+        /*
         echo "</td><td>";
         echo "<input type='text' size='15' name='edit_other-" . $person->getId() . "'";
         if ( $role == Utils::USER ) {
@@ -88,6 +89,7 @@ function show_member_attendees( $member_attendees, $unit_member_ids ) {
             echo " value='" . $attendee->getSpecialsOther() . "' ";
         }
         echo "></input>";
+        */
         echo "</td>";
         if ( $role == Utils::MEALS_ADMIN ) {
             echo "<td>";
@@ -157,6 +159,7 @@ function show_guests( $guests, $guest_unit_id ) {
         }
         echo " value='" . $guest->getId() . "'>&nbsp;";
         echo "</input>";
+        /*
         echo "</td><td>";
         echo "<input type='text' size='15' name='guest_edit_other-" . $guest->getId() . "'";
         if ( $role == Utils::USER ) {
@@ -168,6 +171,7 @@ function show_guests( $guests, $guest_unit_id ) {
             echo " value='" . $guest->getSpecialsOther() . "' ";
         }
         echo "></input>";
+        */
         echo "</td>";
         if ( $role == Utils::MEALS_ADMIN ) {
             echo "<td>";
@@ -228,7 +232,10 @@ function show_guests( $guests, $guest_unit_id ) {
                 <?php if ( $role == Utils::MEALS_ADMIN ): ?>
                     <div class="field">
                         <label>Unit:</label>
-                        <input name='guest_unit' type='number' step='1' min='1' max='33' value=<?php echo $unit_id; ?> >
+                        <input name='guest_unit' size="5" value=
+                            <?php 
+                                echo $unit_id_plus['unit_id'] . $unit_id_plus['sub_unit']; 
+                            ?> >
                     </div>
                 <?php endif; ?>
                 <div class="field">
@@ -254,7 +261,7 @@ function show_guests( $guests, $guest_unit_id ) {
               <col class="attendee_special_col">
               <col class="attendee_special_col">
               <col class="attendee_special_col">
-              <col class="attendee_allergy_col">
+              <!-- <col class="attendee_allergy_col"> -->
               <?php
                 if ( $role == Utils::MEALS_ADMIN ) {
                     echo '<col class="attendee_extra_col">';
@@ -265,7 +272,7 @@ function show_guests( $guests, $guest_unit_id ) {
                 <th>Veg.</th>
                 <th>GF</th>
                 <th>DF</th>
-                <th>Allergies</th>
+                <!-- <th>Allergies</th> -->
                 <?php
                     if ( $role == Utils::MEALS_ADMIN ) {
                         echo '<th>Extra Cost</th>';
@@ -278,7 +285,8 @@ function show_guests( $guests, $guest_unit_id ) {
                     show_member_attendees( $member_attendees, $unit_member_ids );
                 }
                 if ( $guests ) {
-                    show_guests( $guests, $unit_id );
+                    show_guests( $guests, 
+                                 $unit_id_plus['unit_id'] . $unit_id_plus['sub_unit'] );
                 }
             ?> 
             <tr>

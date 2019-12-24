@@ -87,7 +87,7 @@ final class UnitPersonDao extends AbstractDao {
     }
 
     protected function getFindSql( AbstractSearchCriteria $search = null ) {
-        $sql = 'SELECT pu.id as id, pu.unit_id as unit_id, pu.person_id as person_id, '
+        $sql = 'SELECT pu.id as id, pu.unit_id as unit_id, pu.sub_unit as sub_unit, pu.person_id as person_id, '
                 . 'pu.start_date as start_date, pu.end_date as end_date,'
                 . 'pu.type as occupant_type, pn.first_name as first_name, pn.last_name as last_name '
                 . ' FROM person_units pu JOIN person_names pn WHERE pn.person_id = pu.person_id ';
@@ -107,6 +107,10 @@ final class UnitPersonDao extends AbstractDao {
             if ( $search->getUnitId() ) {
                 $sql = $this->handleWhere( $sql, $where_started );
                 $sql .= 'pu.unit_id = ' . $search->getUnitId();
+            }
+            if ( $search->getSubUnit() ) {
+                $sql = $this->handleWhere( $sql, $where_started );
+                $sql .= 'pu.sub_unit = ' . $search->getSubUnit();
             }
             if ( $search->getPersonId() ) {
                 $sql = $this->handleWhere( $sql, $where_started );
@@ -133,8 +137,8 @@ final class UnitPersonDao extends AbstractDao {
      */
     public function insert( AbstractModel $up ) {
         $up->setId( null );
-        $sql = 'INSERT INTO person_units (unit_id, person_id, start_date, end_date, type)
-                VALUES (:unit_id, :person_id, :start_date, :end_date, :type)';
+        $sql = 'INSERT INTO person_units (unit_id, sub_unit, person_id, start_date, end_date, type)
+                VALUES (:unit_id, :sub_unit, :person_id, :start_date, :end_date, :type)';
         $unit_person = $this->execute($sql, $up);
         $unit_person->setId( $this->getDb()->lastInsertId() ); 
         return $unit_person;
@@ -148,6 +152,7 @@ final class UnitPersonDao extends AbstractDao {
         $sql = '
             UPDATE person_units SET
                 unit_id = :unit_id,
+                sub_unit = :sub_unit,
                 person_id = :person_id,
                 start_date = :start_date,
                 end_date = :end_date,
@@ -160,6 +165,7 @@ final class UnitPersonDao extends AbstractDao {
     protected function getParams( AbstractModel $unit_person, $update = false ) {
         $params = array(
             ':unit_id' => $unit_person->getUnitId(),
+            ':sub_unit' => $unit_person->getSubUnit(),
             ':person_id' => $unit_person->getPersonId(),
             ':start_date' => $unit_person->getStartDate()->format( 'Y-m-d' ),
             ':end_date' => $unit_person->getEndDate() ? $unit_person->getEndDate()->format( 'Y-m-d' ) : null,

@@ -24,6 +24,7 @@ final class Person extends AbstractModel {
     private $first_name;
     private $last_name;
     private $unit;
+    private $sub_unit;
 
 
     //~ Getters & setters
@@ -131,11 +132,34 @@ final class Person extends AbstractModel {
                 $this->setLastName( $person_name->getLastName() );
             }
         }
-        foreach( $this->units as $unit_person ) {
-            if ( $unit_person->getEndDate() === null ) {
+        $current_units = $this->getCurrentUnits();
+        if ( count( $current_units ) === 1 ) {
+            $this->setUnit( $current_units[0]->getUnitId() );
+            $this->setSubUnit( $current_units[0]->getSubUnit() );
+            return;
+        }
+        foreach( $current_units as $unit_person ) {
+            if ( $unit_person->getOccupantType() === 'owner' ) {
                 $this->setUnit( $unit_person->getUnitId() );
+                $this->setSubUnit( $unit_person->getSubUnit() );
+                return;
             }
         }
+        foreach( $current_units as $unit_person ) {
+            if ( $unit_person->getOccupantType() === 'renter' ) {
+                $this->setUnit( $unit_person->getUnitId() );
+                $this->setSubUnit( $unit_person->getSubUnit() );
+                return;
+            }
+        }
+        foreach( $current_units as $unit_person ) {
+            if ( $unit_person->getOccupantType() === 'owner-non-occupant' ) {
+                $this->setUnit( $unit_person->getUnitId() );
+                $this->setSubUnit( $unit_person->getSubUnit() );
+                return;
+            }
+        }
+        return null;
     }
     
     public function addPersonName( $pn ) {
@@ -196,5 +220,12 @@ final class Person extends AbstractModel {
 
     public function setUnit($unit) {
         $this->unit = $unit;
+    }
+    public function getSubUnit() {
+        return $this->sub_unit;
+    }
+
+    public function setSubUnit($sub_unit) {
+        $this->sub_unit = $sub_unit;
     }
 }

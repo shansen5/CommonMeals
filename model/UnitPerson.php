@@ -9,6 +9,8 @@ final class UnitPerson extends AbstractModel {
 
     /** @var int */
     private $unit_id;
+    /** @var string */
+    private $sub_unit;
     /** @var int */
     private $person_id;
     private $occupant_type;
@@ -32,6 +34,17 @@ final class UnitPerson extends AbstractModel {
 
     public function setUnitId($id) {
         $this->unit_id = (int) $id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubUnit() {
+        return $this->sub_unit;
+    }
+
+    public function setSubUnit($sub_unit) {
+        $this->sub_unit = $sub_unit;
     }
 
     /**

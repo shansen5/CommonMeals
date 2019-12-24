@@ -174,7 +174,8 @@ function count_specials( $attendee, &$count_veg, &$count_gf, &$count_df ) {
 $role = Utils::getUserRole();
 $errors = array();
 $meal = Utils::getMealByGetId();
-$unit_id = Utils::getUnitIdByPersonId( $_SESSION[ 'oc_user' ]);
+// array of unit_id and sub_group
+$unit_id_plus = Utils::getUnitIdByPersonId( $_SESSION[ 'oc_user' ]);
 $unit_members = array();
 $count_adults = 0;
 $count_child_young = 0;
@@ -184,8 +185,8 @@ $count_gf = 0;
 $count_df = 0;
 
 if ( $role == Utils::USER ) {
-    // Array of UnitPersons in the unit of person identified by 'unit_id'
-    $unit_members = Utils::getUnitMembersByUnitId( $unit_id );
+    // Array of UnitPersons in the unit of person identified by 'unit_id_plus'
+    $unit_members = Utils::getUnitMembersByUnitId( $unit_id_plus );
 } else {
     // Array of UnitPersons for all current members
     $unit_members = Utils::getUnitMembersByUnitId();
@@ -241,7 +242,7 @@ if (array_key_exists('cancel', $_POST)) {
     if ( $total_count + $total_to_add > $meal->getSignUpLimit() ) {
         Flash::addFlash( 'Meal sign up limit exceeded' );
     } else {
-    $guest_unit = $unit_id;
+    $guest_unit = $unit_id_plus['unit_id'] . $unit_id_plus['sub_unit'];
         if (array_key_exists('guest_unit', $_POST)) {
             $guest_unit = $_POST['guest_unit'];
         }

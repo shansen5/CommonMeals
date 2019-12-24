@@ -10,6 +10,7 @@ final class UnitPersonSearchCriteria extends AbstractSearchCriteria {
 
     private $search_date = null;
     private $unit_id = null;
+    private $sub_unit = null;
     private $person_id = null;
     private $occupant_type = null;
     private $order_by_name = false;
@@ -45,6 +46,14 @@ final class UnitPersonSearchCriteria extends AbstractSearchCriteria {
     
     public function getUnitId() {
         return $this->unit_id;
+    }
+    
+    public function setSubUnit( $sub_unit ) {
+        $this->sub_unit = $sub_unit;
+    }
+    
+    public function getSubUnit() {
+        return $this->sub_unit;
     }
     
     public function setPersonId( $id ) {
