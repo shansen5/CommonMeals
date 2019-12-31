@@ -2,7 +2,7 @@
 
 $role = Utils::getUserRole();
 if ( !isset( $_POST['from_date'])) {
-    $now = new DateTime();
+    $now = new DateTime( 'now', new DateTimeZone( 'America/Los_Angeles' ));
     $_POST['from_date'] =  $now->format('m-d-Y') ;
     $threeWeekInterval = new DateInterval( "P3W" );
     $endInterval = $now;

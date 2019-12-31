@@ -177,7 +177,8 @@ final class Utils {
     public static function getUnitMembersByUnitId( $id = null ) {
         $dao = new UnitPersonDao();
         $search = new UnitPersonSearchCriteria();
-        $search->setSearchDate( new DateTime() );
+        $search->setSearchDate( new DateTime( 'now', 
+                                new DateTimeZone( 'America/Los_Angeles' )) );
         $search->setOrderByName();
         if ( $id ) {
             $search->setUnitId( $id['unit_id'] );
@@ -292,7 +293,7 @@ final class Utils {
     
     public static function getCurrentAdultsAndIds() {
         $search = new PersonSearchCriteria();
-        $now = new DateTime();
+        $now = new DateTime( 'now', new DateTimeZone( 'America/Los_Angeles' ));
         $search->setSearchDate( $now );
         $search->setExcludeOccupantType( 'child' );
         $personDao = new PersonDao();

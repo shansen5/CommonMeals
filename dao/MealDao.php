@@ -107,7 +107,8 @@ final class MealDao extends AbstractDao {
     }
 
     protected function getFindSql( AbstractSearchCriteria $search = null ) {
-        $from_date = new DateTime();
+        $from_date = new DateTime( 'now', 
+                            new DateTimeZone( 'America/Los_Angeles' ));
         $to_date = null;
         if ( $search && $search->hasFilter() ) {
             if ( $search->getFromDate() ) {

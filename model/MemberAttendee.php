@@ -38,11 +38,13 @@ final class MemberAttendee extends AbstractMealAttendee {
     public function setAgeGroup( $age_group = "unknown" ) {
         $interval = new DateInterval( 'P8Y' );
         $interval->invert = 1;
-        $young_yrs_ago = new DateTime();
+        $young_yrs_ago = new DateTime( 'now', 
+                                new DateTimeZone( 'America/Los_Angeles' ));
         $young_yrs_ago->add( $interval );
         $interval = new DateInterval( 'P12Y' );
         $interval->invert = 1;
-        $child_older_yrs_ago = new DateTime();
+        $child_older_yrs_ago = new DateTime( 'now', 
+                                new DateTimeZone( 'America/Los_Angeles' ));
         $child_older_yrs_ago->add( $interval );
         $birthdate = new DateTime( $this->getPerson()->getBirthdate() );
         if ( $birthdate < $child_older_yrs_ago ) {

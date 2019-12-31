@@ -266,7 +266,7 @@ final class Meal extends AbstractModel {
 
     public function downloadAttendeesReport( $role, $attendees, $guests ) {
         $dir = getcwd();
-        $filename = 'logs/meal_attendees_report-' . date('Y-m-d-H-mi') . '.xls';
+        $filename = 'logs/meal_attendees_report-' . date('Y-m-d-H-mi') . '.csv';
         $handle = fopen( $filename, 'w' );
         if ( $handle ) {
             fwrite( $handle, "Meal:," . $this->getSummary() . "\n" );
