@@ -1,5 +1,11 @@
 <?php
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require '../util/PHPMailer/PHPMailer.php';
+require '../util/PHPMailer/Exception.php';
+
 /**
  * Model class representing one meal.
  */
@@ -264,7 +270,32 @@ final class Meal extends AbstractModel {
         $this->team_lead = $name;
     }
 
-    public function downloadAttendeesReport( $role, $attendees, $guests ) {
+    public function emailAttendeesReport( $user_person_id, $attendees, $guests ) {
+        $filename = $this->writeAttendeesReportCSV( $attendees, $guests );
+        $dao = new PersonDao();
+        $person = $dao->findById($user_person_id);
+        if ($person === null) {
+            throw new NotFoundException('Unknown Person identifier provided.');
+        }
+        $mail = new PHPMailer;
+        $mail->setFrom( "bellcoho@bellcoho.com", 'Bellcoho CommonMeals' );
+        $mail->addAddress( $person->getEmail() );
+        $mail->Subject = "Meal Attendee Report";
+        $mail->Body = "The attendee report for your meal is attached.";
+        $mail->addAttachment( $filename );
+        if ( !$mail->send()) {
+            return 'Mailer error: ' . $mail->ErrorInfo;
+        } else {
+            return 'Report sent by email';
+        }
+    }
+
+    public function downloadAttendeesReport( $attendees, $guests ) {
+        $filename = $this->writeAttendeesReportCSV( $attendees, $guests );
+        $this->makeHeader( $filename );
+    }
+
+    private function writeAttendeesReportCSV( $attendees, $guests ) {
         $dir = getcwd();
         $filename = 'logs/meal_attendees_report-' . date('Y-m-d-H-mi') . '.csv';
         $handle = fopen( $filename, 'w' );
@@ -278,11 +309,7 @@ final class Meal extends AbstractModel {
             fwrite( $handle, "Older child:," . $this->getMealCost2() . "\n");
             fwrite( $handle, "\n" );
             fwrite( $handle, "Unit,Name,Age,Veg,GF,DF,Allergies" );
-            if ( $role === Utils::MEALS_ADMIN ) {
-                fwrite( $handle, ",Extra Cost,Total Cost,Unit Total\n" );
-            } else {
-                fwrite( $handle, "\n" );
-            }
+            fwrite( $handle, ",Extra Cost,Total Cost,Unit Total\n" );
             $total_income = 0;
             $count_adult = 0;
             $count_child_young = 0;
@@ -293,7 +320,7 @@ final class Meal extends AbstractModel {
                 $name = $person->getFirstName() . " " . 
                             $person->getLastName() . ",";
                 $cost = 0;
-                $line = $this->writeAbstractAttendee( $role, $attendee, 
+                $line = $this->writeAbstractAttendee( $attendee, 
                             $count_adult, $count_child_young, 
                             $count_child_older, $count_veg, $count_gf,
                             $count_df, $cost );
@@ -305,7 +332,7 @@ final class Meal extends AbstractModel {
             foreach( $guests as $guest ) {
                 $name = "Guest,";
                 $cost = 0;
-                $line = $this->writeAbstractAttendee( $role, $guest, 
+                $line = $this->writeAbstractAttendee( $guest, 
                             $count_adult, $count_child_young, 
                             $count_child_older, $count_veg, $count_gf,
                             $count_df, $cost );
@@ -348,16 +375,14 @@ final class Meal extends AbstractModel {
             fwrite( $handle, "\nVeg:," . $count_veg . "\n" );
             fwrite( $handle, "GF:," . $count_gf . "\n" );
             fwrite( $handle, "DF:," . $count_df . "\n" );
-            if ( $role === Utils::MEALS_ADMIN ) {
-                fwrite( $handle, "\nTotal income:," . $total_income );
-            }
+            fwrite( $handle, "\nTotal income:," . $total_income );
         }
         fclose( $handle );
-        $this->makeHeader( $filename );
+        return( $filename );
     }
 
     // Return CSV string of the record
-    private function writeAbstractAttendee( $role, $attendee, 
+    private function writeAbstractAttendee( $attendee, 
                                     &$count_adult, &$count_child_young, 
                                     &$count_child_older, &$count_veg, 
                                     &$count_gf, &$count_df,
@@ -368,24 +393,16 @@ final class Meal extends AbstractModel {
         $count_gf += $this->writeSpecial( $result, $attendee->getSpecialsGF() );
         $count_df += $this->writeSpecial( $result, $attendee->getSpecialsDF() );
         $result .= $attendee->getSpecialsOther() . ",";
-        if ( $role === Utils::MEALS_ADMIN ) {
-            $result .= $attendee->getExtraCost() . ",";
-        }
+        $result .= $attendee->getExtraCost() . ",";
         if ( $age_group === AbstractMealAttendee::AGE_ADULT ) {
             $count_adult++;
-            if ( $role === Utils::MEALS_ADMIN ) {
-                $attendee_cost = $this->getMealCost() + $attendee->getExtraCost();
-            }
+            $attendee_cost = $this->getMealCost() + $attendee->getExtraCost();
         } elseif ( $age_group === AbstractMealAttendee::AGE_CHILD_OLDER ) {
             $count_child_older++;
-            if ( $role === Utils::MEALS_ADMIN ) {
-                $attendee_cost = $this->getMealCost2() + $attendee->getExtraCost();
-            }
+            $attendee_cost = $this->getMealCost2() + $attendee->getExtraCost();
         } else {
             $count_child_young++;
-            if ( $role === Utils::MEALS_ADMIN ) {
-                $attendee_cost = $this->getMealCost1() + $attendee->getExtraCost();
-            }
+            $attendee_cost = $this->getMealCost1() + $attendee->getExtraCost();
         }
         return $result;
     }
@@ -412,7 +429,7 @@ final class Meal extends AbstractModel {
             readfile($filename);
             // exit;
         }
-        unlink( $filename );
+        // unlink( $filename );
     }
 
 }

@@ -175,7 +175,8 @@ $role = Utils::getUserRole();
 $errors = array();
 $meal = Utils::getMealByGetId();
 // array of unit_id and sub_group
-$unit_id_plus = Utils::getUnitIdByPersonId( $_SESSION[ 'oc_user' ]);
+$user_person_id = $_SESSION[ 'oc_user' ];
+$unit_id_plus = Utils::getUnitIdByPersonId( $user_person_id );
 $unit_members = array();
 $count_adults = 0;
 $count_child_young = 0;
@@ -222,27 +223,33 @@ if (array_key_exists('cancel', $_POST)) {
 } elseif (array_key_exists('add_member', $_POST)) {
     // save
     $total_count = $count_adults + $count_child_young + $count_child_older;
-    $person_ids = $_POST[ 'add_attendees' ];
-    if ( count( $person_ids ) + $total_count > $meal->getSignUpLimit() ) {
-        Flash::addFlash( 'Meal sign up limit exceeded' );
-    } elseif  ( array_key_exists( 'add_attendees', $_POST )) {
-        $success = add_members( $meal, $person_ids );
-        if ( $success ) {
-            Flash::addFlash('Attendees saved successfully.');
-        } else {
-            Flash::addFlash( 'Unable to add attendees' );
+    if ( array_key_exists( 'add_attendees', $_POST )) {
+        $person_ids = $_POST[ 'add_attendees' ];
+        if ( count( $person_ids ) + $total_count > $meal->getSignUpLimit() ) {
+            Flash::addFlash( 'Meal sign up limit exceeded' );
+        } elseif  ( array_key_exists( 'add_attendees', $_POST )) {
+            $success = add_members( $meal, $person_ids );
+            if ( $success ) {
+                Flash::addFlash('Attendees saved successfully.');
+            } else {
+                Flash::addFlash( 'Unable to add attendees' );
+            }
         }
+        Utils::redirect( 'meal-signup', array('meal_id' => $meal->getId()));
+    } else {
+        Flash::addFlash( 'No attendees were selected.' );
     }
-    Utils::redirect( 'meal-signup', array('meal_id' => $meal->getId()));
 } elseif (array_key_exists('add_guest', $_POST)) {
     // save
     $total_count = $count_adults + $count_child_young + $count_child_older;
     $total_to_add = $_POST['guest_adults'] + $_POST['guest_child_young']
                         + $_POST['guest_child_older'];
-    if ( $total_count + $total_to_add > $meal->getSignUpLimit() ) {
+    if ( $total_to_add == 0 ) {
+         Flash::addFlash('No guests were selected.');
+    } elseif ( $total_count + $total_to_add > $meal->getSignUpLimit() ) {
         Flash::addFlash( 'Meal sign up limit exceeded' );
     } else {
-    $guest_unit = $unit_id_plus['unit_id'] . $unit_id_plus['sub_unit'];
+        $guest_unit = $unit_id_plus['unit_id'] . $unit_id_plus['sub_unit'];
         if (array_key_exists('guest_unit', $_POST)) {
             $guest_unit = $_POST['guest_unit'];
         }
@@ -324,8 +331,8 @@ if (array_key_exists('cancel', $_POST)) {
     }
     Utils::redirect( 'meal-signup', array('meal_id' => $meal->getId()));
 } elseif ( array_key_exists( 'download_attendees', $_POST )) {
-    $meal->downloadAttendeesReport( $role, $member_attendees, $guests );
-} elseif ( array_key_exists( 'download_units', $_POST )) {
-    $meal->downloadUnitsReport( $role, $member_attendees, $guests );
-    download_units( $role, $meal, $member_attendees );
+    $meal->downloadAttendeesReport( $member_attendees, $guests );
+} elseif ( array_key_exists( 'email_attendees', $_POST )) {
+    $result = $meal->emailAttendeesReport( $user_person_id, $member_attendees, $guests );
+    Flash::addFlash( $result );
 }
