@@ -35,8 +35,9 @@ function show_member_attendees( $member_attendees, $unit_member_ids ) {
         }
         echo " value='" . $person->getId() . "'>&nbsp;";
         echo $person->getFirstName() . " " .
-             $person->getLastName();
-        echo "</input>";
+             $person->getLastName() . " [" .
+             $person->getUnit() . $person->getSubUnit() . "]"; 
+             echo "</input>";
         echo "</td><td>";
         echo "<input type='checkbox' name='" . $edit_veg . "'";
         if ( $attendee->getSpecialsVeg() ) {
@@ -219,7 +220,8 @@ function show_guests( $guests, $guest_unit_id ) {
                     echo '<option value = ' . 
                          $unit_person->getPersonId() . '> ' .
                          $unit_person->getFirstName() . ' ' . 
-                         $unit_person->getLastName() . 
+                         $unit_person->getLastName() . ' [' .
+                         $unit_person->getUnitId() . $unit_person->getSubUnit() . ']' .
                          '</option>';
                 }
             } ?>
