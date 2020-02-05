@@ -110,7 +110,7 @@ final class UnitPersonDao extends AbstractDao {
             }
             if ( $search->getSubUnit() ) {
                 $sql = $this->handleWhere( $sql, $where_started );
-                $sql .= 'pu.sub_unit = ' . $search->getSubUnit();
+                $sql .= 'pu.sub_unit = "' . $search->getSubUnit() . '"';
             }
             if ( $search->getPersonId() ) {
                 $sql = $this->handleWhere( $sql, $where_started );
